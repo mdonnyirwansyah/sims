@@ -1,0 +1,357 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Student;
+use App\Models\User;
+use App\Http\Requests\StudentStoreRequest;
+use App\Http\Requests\StudentUpdateRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
+
+
+class StudentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $data = [
+            'title' => 'Data Siswa'
+        ];
+
+        return view('main.data.student.index', compact('data'));
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getData()
+    {
+        $students = Student::orderBy('registered_at', 'DESC')->get();
+        $data = [];
+
+        foreach ($students as $index => $student) {
+            $data[$index] = [
+                'id' => $student->id,
+                'nis_nisn' => $student->nis .' / '. $student->nisn,
+                'name' => $student->user->name,
+                'class_now' => $student->class_now,
+                'phone' => $student->user->address->phone
+            ];
+        }
+
+        return DataTables::of($data)
+        ->addIndexColumn()
+        ->addColumn('action', function ($data) {
+            return '
+            <a href="'. route("data.student.edit", $data['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
+                <i class="fa fa-pen"></i>
+            </a>
+            <button id="'. $data['id']. '" route="'. route("data.student.destroy", $data['id']) .'" onclick="handleDelete('. $data['id'] .')" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
+                <i class="fa fa-trash"></i>
+            </button>
+            ';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
+
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $data = [
+            'title' => 'Tambah Siswa'
+        ];
+
+        return view('main.data.student.create', compact('data'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StudentStoreRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StudentStoreRequest $request)
+    {
+        $families = collect([]);
+        $father = collect($request->father);
+        $mother = collect($request->mother);
+        $guardian = collect($request->guardian);
+        if ($request->guardian['name'] && $request->guardian['occupation'] && $request->guardian['address'] && $request->guardian['phone']) {
+            $families->push($father, $mother, $guardian);
+        } else {
+            $families->push($father, $mother);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $userCreated = User::create([
+                'role_id' => 3,
+                'name' => $request->name,
+                'username' => $request->nisn,
+                'password' => Hash::make($request->nisn)
+            ]);
+            $studentCreated = $userCreated->student()->create([
+                'nis' => $request->nis,
+                'nisn' => $request->nisn,
+                'class_now' => $request->class_at,
+                'class_at' => $request->class_at,
+                'registered_at' => $request->registered_at
+            ]);
+            if ($request->profile_picture) {
+                $profile_picture = md5($request->profile_picture.microtime().'.'.$request->profile_picture->extension());
+                Storage::putFileAs(
+                    'public/profile-pictures',
+                    $request->profile_picture,
+                    $profile_picture
+                );
+            }
+            $userCreated->user_detail()->create([
+                'place_of_birth' => $request->place_of_birth,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'religion' => $request->religion,
+                'profile_picture' => $request->profile_picture ? $profile_picture : null
+            ]);
+            $userCreated->address()->create([
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone
+            ]);
+            $familiesCreate = [];
+            foreach ($families as $index => $family) {
+                $familiesCreate[$index] = [
+                    'type' => $family['type'],
+                    'name' => $family['name'],
+                    'occupation' => $family['occupation']
+                ];
+            }
+            $familiesCreated = $studentCreated->families()->createMany($familiesCreate);
+            $familiesCreated[0]->address()->create([
+                'address' => $request->father['address'],
+                'phone' => $request->father['phone']
+
+            ]);
+            if ($familiesCreated->count() === 3) {
+                $familiesCreated[2]->address()->create([
+                    'address' => $request->guardian['address'],
+                    'phone' => $request->guardian['phone']
+    
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+
+        return redirect()->route('data.student.index')->with('ok', 'Data berhasil ditambah!');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Student  $student
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Student $student)
+    {
+        $data = [
+            'title' => 'Edit Siswa',
+            'student' => $student
+        ];
+
+        return view('main.data.student.edit', compact('data'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\StudentUpdateRequest  $request
+     * @param  \App\Models\Student  $student
+     * @return \Illuminate\Http\Response
+     */
+    public function update(StudentUpdateRequest $request, Student $student)
+    {
+        $families = collect([]);
+        $father = collect($request->father);
+        $mother = collect($request->mother);
+        $guardian = collect($request->guardian);
+        if ($request->guardian['name'] && $request->guardian['occupation'] && $request->guardian['address'] && $request->guardian['phone']) {
+            $families->push($father, $mother, $guardian);
+        } else {
+            $families->push($father, $mother);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $student->user()->update([
+                'role_id' => 3,
+                'name' => $request->name,
+                'username' => $request->nisn,
+            ]);
+            $student->update([
+                'nis' => $request->nis,
+                'nisn' => $request->nisn,
+                'class_now' => $request->class_at,
+                'class_at' => $request->class_at,
+                'registered_at' => $request->registered_at
+            ]);
+            if ($request->profile_picture) {
+                if ($student->user->user_detail->profile_picture) {
+                    Storage::delete('public/profile-pictures/'.$student->user->user_detail->profile_picture);
+                }
+
+                $profile_picture = md5($request->profile_picture.microtime().'.'.$request->profile_picture->extension());
+                Storage::putFileAs(
+                    'public/profile-pictures',
+                    $request->profile_picture,
+                    $profile_picture
+                );
+            }
+            $student->user->user_detail()->update([
+                'place_of_birth' => $request->place_of_birth,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'religion' => $request->religion,
+                'profile_picture' => $request->profile_picture ? $profile_picture : $student->user->user_detail->profile_picture
+            ]);
+            $student->user->address()->update([
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone
+            ]);
+            $familiesUpdate = $student->families()->get();
+            if ($familiesUpdate->count() === 3 && $families->count() === 3) {
+                $familiesUpdate[0]->update([
+                    'type' => $request->father['type'],
+                    'name' => $request->father['name'],
+                    'occupation' => $request->father['occupation']
+                ]);
+                $familiesUpdate[1]->update([
+                    'type' => $request->mother['type'],
+                    'name' => $request->mother['name'],
+                    'occupation' => $request->mother['occupation']
+                ]);
+                $familiesUpdate[2]->update([
+                    'type' => $request->guardian['type'],
+                    'name' => $request->guardian['name'],
+                    'occupation' => $request->guardian['occupation']
+                ]);
+                $familiesUpdate[0]->address()->update([
+                    'address' => $request->father['address'],
+                    'phone' => $request->father['phone']
+    
+                ]);
+                $familiesUpdate[2]->address()->update([
+                    'address' => $request->guardian['address'],
+                    'phone' => $request->guardian['phone']
+    
+                ]);
+            }
+            if ($familiesUpdate->count() === 2 && $families->count() === 3) {
+                $familiesUpdate[0]->update([
+                    'type' => $request->father['type'],
+                    'name' => $request->father['name'],
+                    'occupation' => $request->father['occupation']
+                ]);
+                $familiesUpdate[1]->update([
+                    'type' => $request->mother['type'],
+                    'name' => $request->mother['name'],
+                    'occupation' => $request->mother['occupation']
+                ]);
+                $familiesCreated = $student->families()->create([
+                    'type' => $request->guardian['type'],
+                    'name' => $request->guardian['name'],
+                    'occupation' => $request->guardian['occupation']
+                ]);
+                $familiesUpdate[0]->address()->update([
+                    'address' => $request->father['address'],
+                    'phone' => $request->father['phone']
+    
+                ]);
+                $familiesCreated->address()->create([
+                    'address' => $request->guardian['address'],
+                    'phone' => $request->guardian['phone']
+    
+                ]);
+            }
+            if ($familiesUpdate->count() === 2 && $families->count() === 2) {
+                $familiesUpdate[0]->update([
+                    'type' => $request->father['type'],
+                    'name' => $request->father['name'],
+                    'occupation' => $request->father['occupation']
+                ]);
+                $familiesUpdate[1]->update([
+                    'type' => $request->mother['type'],
+                    'name' => $request->mother['name'],
+                    'occupation' => $request->mother['occupation']
+                ]);
+                $familiesUpdate[0]->address()->update([
+                    'address' => $request->father['address'],
+                    'phone' => $request->father['phone']
+    
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+
+        return redirect()->route('data.student.index')->with('ok', 'Data berhasil diupdate!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Student  $student
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Student $student)
+    {
+        try {
+            DB::beginTransaction();
+            if ($student->user->user_detail->profile_picture) {
+                Storage::delete('public/profile-pictures/'.$student->user->user_detail->profile_picture);
+            }
+            
+            $families = $student->families()->get();
+            $families[0]->address()->delete();
+            if ($families->count() === 3) {
+                $families[2]->address()->delete();
+            }
+            $student->user->address()->delete();
+            $student->user()->delete();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json(['failed' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => 'Data berhasil dihapus!']);
+    }
+}

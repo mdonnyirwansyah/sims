@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,20 +24,21 @@ Route::get('profile', function () {
     return view('main.profile.student.index');
 })->name('profile');
 Route::prefix('data')->name('data.')->group(function () {
+    Route::prefix('student')->name('student.')->controller(StudentController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('get-data', 'getData')->name('getData');
+        Route::get('create', 'create')->name('create');
+        Route::post('', 'store')->name('store');
+        Route::get('edit/{student}', 'edit')->name('edit');
+        Route::put('{student}', 'update')->name('update');
+        Route::delete('{student}', 'destroy')->name('destroy');
+    });
     Route::prefix('school-year')->name('school-year.')->group(function () {
         Route::get('', function () {
             return view('main.data.school-year.index');
         })->name('index');
         Route::get('create', function () {
             return view('main.data.school-year.create');
-        })->name('create');
-    });
-    Route::prefix('student')->name('student.')->group(function () {
-        Route::get('', function () {
-            return view('main.data.student.index');
-        })->name('index');
-        Route::get('create', function () {
-            return view('main.data.student.create');
         })->name('create');
     });
     Route::prefix('teacher')->name('teacher.')->group(function () {

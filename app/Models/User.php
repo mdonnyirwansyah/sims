@@ -19,8 +19,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'username',
         'password',
+        'role_id'
     ];
 
     /**
@@ -30,15 +31,37 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Get the role that owns the user.
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the user_detail associated with the user.
+     */
+    public function user_detail()
+    {
+        return $this->hasOne(UserDetail::class);
+    }
+
+    /**
+     * Get the user's address.
+     */
+    public function address()
+    {
+        return $this->morphOne(Address::class, 'addressable');
+    }
+
+    /**
+     * Get the student associated with the user.
+     */
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
 }
