@@ -212,7 +212,6 @@ class StudentController extends Controller
             $student->update([
                 'nis' => $request->nis,
                 'nisn' => $request->nisn,
-                'class_now' => $request->class_at,
                 'class_at' => $request->class_at,
                 'registered_at' => $request->registered_at
             ]);
@@ -320,7 +319,7 @@ class StudentController extends Controller
             return redirect()->back()->with('failed', $e->getMessage());
         }
 
-        return redirect()->route('data.student.index')->with('ok', 'Data berhasil diupdate!');
+        return redirect()->route('data.student.index')->with('ok', 'Data berhasil diubah!');
     }
 
     /**

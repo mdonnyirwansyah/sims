@@ -31,6 +31,16 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
     ];
 
     /**
@@ -63,5 +73,13 @@ class User extends Authenticatable
     public function student()
     {
         return $this->hasOne(Student::class);
+    }
+
+    /**
+     * Get the teacher associated with the user.
+     */
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
     }
 }

@@ -1,11 +1,104 @@
 @extends('layouts.main.index')
 
-@section('title', 'Data Guru')
+@section('title', $data['title'])
+
+@push('stylesheet')
+<!-- Sweetaler2 -->
+<link rel="stylesheet" href="{{ asset('plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+<!-- DataTables -->
+<link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-rowreorder/css/rowReorder.bootstrap4.min.css') }}">
+@endpush
 
 @push('javascript')
-@if(session()->has('status'))
+<!-- Sweetaler2 -->
+<script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<!-- DataTables -->
+<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script>
-  toastr.success("{{ __('Successfully saved!') }}", 'Notification,');
+$(document).ready(function() {
+    $('#teachers-table').DataTable({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        responsive: true,
+        rowReorder: true,
+        ajax: {
+            url: '{{ route('data.teacher.getData') }}',
+            type: 'GET',
+        },
+        columns: [
+            {
+                data: 'DT_RowIndex',
+                width: 50,
+                orderable: false,
+                searchable: false
+            },
+            {data: 'nip', name: 'nip'},
+            {data: 'name', name: 'name'},
+            {data: 'education', name: 'education'},
+            {data: 'phone', name: 'phone'},
+            {
+                data: 'action',
+                name: 'action',
+                width: 75,
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+});
+</script>
+
+<script>
+function handleDelete(id) {
+    let route = $(`#${id}`).attr('route');
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+        }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: route,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.ok) {
+                        $('#teachers-table').DataTable().draw();
+                        toastr.success(response.ok, 'Pemberitahuan,');
+                    } 
+                    if (response.failed) {
+                        $("#alert").removeClass("d-none");
+                        $("#failed").append(response.failed);
+                    } 
+                    if (!response.ok && !response.failed) {
+                        toastr.error('Something when wrong...', 'Pemberitahuan,');
+                    }
+                },
+            });
+        }
+    })
+}
+</script>
+
+@if($message = Session::get('ok'))
+<script>
+  toastr.success('{{ $message }}', 'Pemberitahuan,');
 </script>
 @endif
 @endpush
@@ -16,12 +109,12 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Data Guru</h1>
+                <h1> {{ $data["title"] }}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item active">Data Guru</li>
+                    <li class="breadcrumb-item active"> {{ $data["title"] }}</li>
                 </ol>
             </div>
         </div>
@@ -33,12 +126,17 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible d-none" id="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                    <div id="failed"></div>
+                </div>
                 <div class="card">
                     <div class="card-body">
                         <a href="{{ route('data.teacher.create') }}" class="btn btn-primary">Tambah</a>
                         <hr>
                         <div>
-                            <table class="table table-bordered">
+                            <table id="teachers-table" class="table table-bordered table-striped" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">No</th>
@@ -49,52 +147,10 @@
                                         <th style="width: 40px">Aksi</th>
                                     </tr>
                                 </thead>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>197312122003121003</td>
-                                        <td>Budi, S. Pd.</td>
-                                        <td>S1 Pendidikan Matematika</td>
-                                        <td>082287689392</td>
-                                        <td>
-                                            <div class="d-flex align-items-center justify-content-sm-center justify-content-start">
-                                                <a href="#" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                    <i class="fa fa-pen"></i>
-                                                </a>
-                                                <button id="" route="" onclick="" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>198012122003133005</td>
-                                        <td>Bunga, S. Pd.</td>
-                                        <td>S1 Pendidikan Bahasa Indonesia</td>
-                                        <td>085374866368</td>
-                                        <td>
-                                            <div class="d-flex align-items-center justify-content-sm-center justify-content-start">
-                                                <a href="#" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                    <i class="fa fa-pen"></i>
-                                                </a>
-                                                <button id="" route="" onclick="" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 <tbody>
 
                                 </tbody>
                             </table>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="clearfix">
-                            <ul class="pagination pagination-sm m-0 float-right">
-                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
                         </div>
                     </div>
                     <!-- /.card-body -->
