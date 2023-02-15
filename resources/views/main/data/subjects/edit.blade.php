@@ -13,7 +13,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('data.subjects.index') }}">Data Guru</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('data.subjects.index') }}">Data Mata Pelajaran</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
@@ -35,12 +35,13 @@
                 @endif
                 <div class="card">
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('data.subjects.store') }}" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" action="{{ route('data.subjects.update', $data['subjects']->id) }}" method="post" enctype="multipart/form-data">
+                            @method('put')
                             @csrf
                             <div class="form-group row">
-                                <label for="name" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
+                                <label for="name" class="col-sm-3 col-form-label">Mata Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $data['subjects']->name }}">
                                     @error('name')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -51,8 +52,8 @@
                             <div class="form-group row">
                                 <label for="group" class="col-sm-3 col-form-label">Kelompok <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control @error('group') is-invalid @enderror" id="group" name="group">
-                                        <option selected disabled>Pilih Kelompok</option>
+                                    <select class="form-control @error('group') is-invalid @enderror" id="group" name="group" value="{{ old('group') ?? $data['subjects']->group }}">
+                                        <option disabled>Pilih Kelompok</option>
                                         <option value="Kelompok A (Umum)">Kelompok A (Umum)</option>
                                         <option value="Kelompok B (Umum)">Kelompok B (Umum)</option>
                                         <option value="Kelompok C (Peminatan)">Kelompok C (Peminatan)</option>
@@ -67,7 +68,7 @@
                             <div class="form-group row">
                                 <div class="col-sm-12">
                                     <a href="{{ route('data.subjects.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
-                                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                    <button type="submit" class="btn btn-primary float-right">Simpan</button>
                                 </div>
                             </div>
                         </form>

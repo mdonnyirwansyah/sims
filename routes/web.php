@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\BerandaController;
-use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SchoolYearController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -53,13 +54,14 @@ Route::prefix('data')->name('data.')->group(function () {
         Route::put('{school_year}', 'update')->name('update');
         Route::delete('{school_year}', 'destroy')->name('destroy');
     });
-    Route::prefix('subjects')->name('subjects.')->group(function () {
-        Route::get('', function () {
-            return view('main.data.subjects.index');
-        })->name('index');
-        Route::get('create', function () {
-            return view('main.data.subjects.create');
-        })->name('create');
+    Route::prefix('subjects')->name('subjects.')->controller(SubjectsController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('get-data', 'getData')->name('getData');
+        Route::get('create', 'create')->name('create');
+        Route::post('', 'store')->name('store');
+        Route::get('edit/{subjects}', 'edit')->name('edit');
+        Route::put('{subjects}', 'update')->name('update');
+        Route::delete('{subjects}', 'destroy')->name('destroy');
     });
     Route::prefix('class')->name('class.')->group(function () {
         Route::get('', function () {
