@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SchoolYearController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,13 +44,14 @@ Route::prefix('data')->name('data.')->group(function () {
         Route::put('{teacher}', 'update')->name('update');
         Route::delete('{teacher}', 'destroy')->name('destroy');
     });
-    Route::prefix('school-year')->name('school-year.')->group(function () {
-        Route::get('', function () {
-            return view('main.data.school-year.index');
-        })->name('index');
-        Route::get('create', function () {
-            return view('main.data.school-year.create');
-        })->name('create');
+    Route::prefix('school-year')->name('school-year.')->controller(SchoolYearController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('get-data', 'getData')->name('getData');
+        Route::get('create', 'create')->name('create');
+        Route::post('', 'store')->name('store');
+        Route::get('edit/{school_year}', 'edit')->name('edit');
+        Route::put('{school_year}', 'update')->name('update');
+        Route::delete('{school_year}', 'destroy')->name('destroy');
     });
     Route::prefix('subjects')->name('subjects.')->group(function () {
         Route::get('', function () {

@@ -89,7 +89,6 @@ class TeacherController extends Controller
      */
     public function store(TeacherStoreRequest $request)
     {
-
         try {
             DB::beginTransaction();
 
@@ -143,7 +142,7 @@ class TeacherController extends Controller
     public function edit(Teacher $teacher)
     {
         $data = [
-            'title' => 'Tambah Guru',
+            'title' => 'Edit Guru',
             'teacher' => $teacher
         ];
 

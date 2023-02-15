@@ -24,7 +24,6 @@ class TeacherUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
             'nip' => 'required|unique:users,username,'.$this->teacher->id,
             'place_of_birth' => 'required',
             'date_of_birth' => 'required',

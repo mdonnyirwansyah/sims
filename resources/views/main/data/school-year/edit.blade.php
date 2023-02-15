@@ -13,7 +13,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('data.school-year.index') }}">Data Guru</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('data.school-year.index') }}">Data Tahun Pelajaran</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
@@ -35,12 +35,13 @@
                 @endif
                 <div class="card">
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('data.school-year.store') }}" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" action="{{ route('data.school-year.update', $data['schoolYear']->id) }}" method="post" enctype="multipart/form-data">
+                            @method('put')
                             @csrf
                             <div class="form-group row">
                                 <label for="name" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $data['schoolYear']->name }}">
                                     @error('name')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -51,7 +52,7 @@
                             <div class="form-group row">
                                 <div class="col-sm-12">
                                     <a href="{{ route('data.school-year.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
-                                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                    <button type="submit" class="btn btn-primary float-right">Simpan</button>
                                 </div>
                             </div>
                         </form>
