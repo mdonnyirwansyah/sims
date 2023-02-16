@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\SchoolYearController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectsController;
@@ -63,40 +64,16 @@ Route::prefix('data')->name('data.')->group(function () {
         Route::put('{subjects}', 'update')->name('update');
         Route::delete('{subjects}', 'destroy')->name('destroy');
     });
-    Route::prefix('class')->name('class.')->group(function () {
-        Route::get('', function () {
-            return view('main.data.class.index');
-        })->name('index');
-        Route::get('create', function (Request $request) {
-            $request->validate([
-                'school_year' => 'required',
-                'class' => 'required'
-            ]);
-
-            $school_year = explode('|', $request->school_year);
-            $data = [
-                'school_year' => [
-                    'id' => $school_year[0],
-                    'name' => $school_year[1]
-                ],
-                'class' => $request->class
-            ];
-
-            return view('main.data.class.create', compact('data'));
-        })->name('create');
-        Route::post('store', function (Request $request) {
-            $request->validate([
-                'school_year_id' => 'required',
-                'class' => 'required',
-                'name' => 'required',
-                'teacher_id' => 'required'
-            ]);
-
-            return "success";
-        })->name('store');
-        Route::get('student-add', function () {
-            return view('main.data.class.student-add');
-        })->name('student-add');
+    Route::prefix('class-room')->name('class-room.')->controller(ClassRoomController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('get-data', 'getData')->name('getData');
+        Route::get('create', 'create')->name('create');
+        Route::post('', 'store')->name('store');
+        Route::get('student-add/{class_room}', 'studentAdd')->name('student-add');
+        Route::put('student-add/{class_room}', 'studentAddStore')->name('student-add-store');
+        Route::get('edit/{class_room}', 'edit')->name('edit');
+        Route::put('{class_room}', 'update')->name('update');
+        Route::delete('{class_room}', 'destroy')->name('destroy');
     });
 });
 Route::prefix('lesson-schedule')->name('lesson-schedule.')->group(function () {

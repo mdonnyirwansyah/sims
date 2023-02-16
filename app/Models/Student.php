@@ -28,4 +28,12 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * The class_rooms that belong to the student.
+     */
+    public function class_rooms()
+    {
+        return $this->belongsToMany(ClassRoom::class);
+    }
 }

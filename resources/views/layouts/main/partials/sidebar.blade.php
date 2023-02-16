@@ -68,7 +68,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('data.class.index') }}" class="nav-link {{ request()->routeIs('data.class.*') ? 'active' : '' }}">
+                            <a href="{{ route('data.class-room.index') }}" class="nav-link {{ request()->routeIs('data.class-room.*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Kelas</p>
                             </a>
