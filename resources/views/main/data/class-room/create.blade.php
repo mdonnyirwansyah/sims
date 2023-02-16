@@ -2,6 +2,24 @@
 
 @section('title', $data['title'])
 
+@push('stylesheet')
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+@endpush
+
+@push('javascript')
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
+});
+</script>
+@endpush
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -61,7 +79,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="name" class="col-sm-3 col-form-label">Nama Kelas</label>
+                                <label for="name" class="col-sm-3 col-form-label">Nama Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
                                     @error('name')
@@ -72,9 +90,9 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="teacher_id" class="col-sm-3 col-form-label">Wali Kelas</label>
+                                <label for="teacher_id" class="col-sm-3 col-form-label">Wali Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
+                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
                                         <option selected disabled>Pilih Wali Kelas</option>
                                         @foreach ($data['teachers'] as $teacher)
                                             <option value="{{ $teacher->id }}">{{ $teacher->nip .' - '. $teacher->user->name }}</option>

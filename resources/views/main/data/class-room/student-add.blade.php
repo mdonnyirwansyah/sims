@@ -73,7 +73,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="name" class="col-sm-3 col-form-label">Nama Kelas <span class="text-danger">*</span></label>
+                                <label for="name" class="col-sm-3 col-form-label">Nama Kelas</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ $data['classRoom']->name }}" readonly>
                                 </div>
@@ -85,7 +85,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="students" class="col-sm-3 col-form-label">Data Siswa</label>
+                                <label for="students" class="col-sm-3 col-form-label">Data Siswa <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('students') is-invalid @enderror" multiple="multiple" data-placeholder="Pilih Siswa" style="width: 100%;" id="students" name="students[]">
                                         @foreach ($data['students'] as $student)

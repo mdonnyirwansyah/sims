@@ -77,7 +77,7 @@ class ClassRoomController extends Controller
      */
     public function create(ClassRoomCreateRequest $request)
     {
-        $schoolYear = SchoolYear::findOrFail($request->school_year);
+        $schoolYear = SchoolYear::findOrFail($request->school_year_id);
         $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
