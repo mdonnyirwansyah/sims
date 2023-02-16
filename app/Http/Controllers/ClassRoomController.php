@@ -188,7 +188,18 @@ class ClassRoomController extends Controller
      */
     public function update(ClassRoomRequest $request, ClassRoom $classRoom)
     {
-        //
+        try {
+            $classRoom->update([
+                'school_year_id' => $request->school_year_id,
+                'class' => $request->class,
+                'name' => $request->name,
+                'teacher_id' => $request->teacher_id
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+
+        return redirect()->route('data.class-room.index')->with('ok', 'Data berhasil diubah!');
     }
 
     /**
