@@ -2,6 +2,14 @@
 
 @section('title', $data['title'])
 
+@push('javascript')
+<script>
+$(document).ready(function() {
+    $('#group').val("{{ $data['subjects']->group }}").change();
+});
+</script>
+@endpush
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
