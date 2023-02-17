@@ -143,11 +143,11 @@ function handleDelete(id) {
                     <div id="failed"></div>
                 </div>
                 <div class="card">
-                    <div class="card-body">
-                        <form id="filter" action="{{ route('data.class-room.create') }}" method="get">
-                            <div class="input-group mb-3">
+                    <div class="card-header">
+                        <form id="filter">
+                            <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-primary">Tambah</button>
+                                    <button type="button" class="btn btn-default" disabled>Filter</button>
                                 </div>
                                 <!-- /btn-group -->
                                 <select class="form-control @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
@@ -164,6 +164,13 @@ function handleDelete(id) {
                                 </select>
                             </div>
                         </form>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="{{ route('data.class-room.create') }}" class="btn btn-primary float-right">Tambah</a>
+                            </div>
+                        </div>
                         <hr>
                         <div>
                             <table id="class-rooms-table" class="table table-bordered table-striped" style="width:100%">

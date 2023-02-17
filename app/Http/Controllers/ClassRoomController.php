@@ -38,10 +38,10 @@ class ClassRoomController extends Controller
      */
     public function getData(Request $request)
     {
+        $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
+
         if ($request->school_year_id || $request->class) {
-            $classRooms = ClassRoom::where('school_year_id', $request->school_year_id)->orWhere('class', $request->class)->orderBy('name', 'DESC')->get();
-        } else {
-            $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
+            $classRooms = ClassRoom::where('school_year_id', $request->school_year_id)->where('class', $request->class)->orderBy('name', 'DESC')->get();
         }
 
         return DataTables::of($classRooms)
@@ -72,20 +72,18 @@ class ClassRoomController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param  \App\Http\Requests\ClassRoomCreateRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(ClassRoomCreateRequest $request)
+    public function create()
     {
-        $schoolYear = SchoolYear::findOrFail($request->school_year_id);
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
         $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
         
         $data = [
             'title' => 'Data Kelas',
-            'schoolYear' => $schoolYear,
-            'class' => $request->class,
+            'schoolYears' => $schoolYears,
             'teachers' => $teachers
         ];
 
@@ -166,15 +164,18 @@ class ClassRoomController extends Controller
      */
     public function edit(ClassRoom $classRoom)
     {
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
         $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
-
+        
         $data = [
-            'title' => 'Data Kelas',
+            'title' => 'Edit Kelas',
             'classRoom' => $classRoom,
+            'schoolYears' => $schoolYears,
             'teachers' => $teachers
         ];
+
 
         return view('main.data.class-room.edit', compact('data'));
     }
