@@ -1,11 +1,119 @@
 @extends('layouts.main.index')
 
-@section('title', 'Jadwal Pelajaran')
+@section('title', $data['title'])
+
+@push('stylesheet')
+<!-- Sweetaler2 -->
+<link rel="stylesheet" href="{{ asset('plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+<!-- DataTables -->
+<link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-rowreorder/css/rowReorder.bootstrap4.min.css') }}">
+@endpush
 
 @push('javascript')
-@if(session()->has('status'))
+<!-- Sweetaler2 -->
+<script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<!-- DataTables -->
+<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script>
-  toastr.success("{{ __('Successfully saved!') }}", 'Notification,');
+$(document).ready(function() {
+    $('#filter').change(function (e) {
+        lessonSchedules.draw();
+        e.preventDefault();
+    });
+    var lessonSchedules = $('#lesson-schedules-table').DataTable({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        responsive: true,
+        rowReorder: true,
+        ajax: {
+            url: '{{ route('lesson-schedule.getData') }}',
+            type: 'post',
+            data: function (d) {
+                d.school_year_id = $('#school_year_id').val();
+                d.semester = $('#semester').val();
+                d.teacher_id = $('#teacher_id').val();
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        },
+        columns: [
+            {
+                data: 'DT_RowIndex',
+                width: 50,
+                orderable: false,
+                searchable: false
+            },
+            {data: 'school_year', name: 'school_year'},
+            {data: 'semester', name: 'semester'},
+            {data: 'class_room', name: 'class_room'},
+            {data: 'teacher', name: 'teacher'},
+            {data: 'subjects', name: 'subjects'},
+            {data: 'day', name: 'day'},
+            {data: 'time', name: 'time'},
+            {
+                data: 'action',
+                name: 'action',
+                width: 75,
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+});
+</script>
+
+<script>
+function handleDelete(id) {
+    let route = $(`#${id}`).attr('route');
+    Swal.fire({
+        title: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+        }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: route,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.ok) {
+                        $('#lesson-schedules-table').DataTable().draw();
+                        toastr.success(response.ok, 'Pemberitahuan,');
+                    } 
+                    if (response.failed) {
+                        $('#alert').removeClass('d-none');
+                        $('#failed').append(response.failed);
+                    } 
+                    if (!response.ok && !response.failed) {
+                        toastr.error('Something when wrong...', 'Pemberitahuan,');
+                    }
+                },
+            });
+        }
+    })
+}
+</script>
+
+@if($message = Session::get('ok'))
+<script>
+  toastr.success('{{ $message }}', 'Pemberitahuan,');
 </script>
 @endif
 @endpush
@@ -16,16 +124,17 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Jadwal Pelajaran</h1>
+                <h1>{{ $data["title"] }}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item active">Jadwal Pelajaran</li>
+                    <li class="breadcrumb-item active"> {{ $data["title"] }}</li>
                 </ol>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 </section>
 
 <!-- Main content -->
@@ -33,75 +142,58 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible d-none" id="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                    <div id="failed"></div>
+                </div>
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('lesson-schedule.create') }}" method="get">
+                        <form id="filter" action="{{ route('lesson-schedule.create') }}" method="get">
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <button type="submit" class="btn btn-primary">Tambah</button>
                                 </div>
                                 <!-- /btn-group -->
-                                <select class="form-control @error('school_year') is-invalid @enderror" name="school_year">
+                                <select class="form-control @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
                                     <option selected disabled>Pilih Tahun Pelajaran</option>
-                                    <option value="1|2022/2023">2022/2023</option>
+                                    @foreach ($data['schoolYears'] as $schoolYear)
+                                        <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
+                                    @endforeach
                                 </select>
-                                <select class="form-control @error('semester') is-invalid @enderror" name="semester">
+                                <select class="form-control @error('semester') is-invalid @enderror"  id="semester" name="semester">
                                     <option selected disabled>Pilih Semester</option>
                                     <option value="1 (satu)">1 (satu)</option>
                                     <option value="2 (dua)">2 (dua)</option>
                                 </select>
-                                <select class="form-control @error('teacher') is-invalid @enderror" name="teacher">
+                                <select class="form-control @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
                                     <option selected disabled>Pilih Guru</option>
-                                    <option value="197312122003121003|Budi, S. Pd.">197312122003121003 - Budi, S. Pd.</option>
+                                    @foreach ($data['teachers'] as $teacher)
+                                        <option value="{{ $teacher->id }}">{{ $teacher->nip. ' - ' .$teacher->user->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </form>
                         <hr>
                         <div>
-                            <table class="table table-bordered">
+                            <table id="lesson-schedules-table" class="table table-bordered table-striped" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">No</th>
                                         <th>Tahun Pelajaran</th>
                                         <th>Semester</th>
+                                        <th>Kelas</th>
                                         <th>Guru</th>
                                         <th>Mata Pelajaran</th>
                                         <th>Hari</th>
                                         <th>Jam</th>
-                                        <th style="width: 40px">Aksi</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>2022/2023</td>
-                                        <td>2 (dua)</td>
-                                        <td>197312122003121003 - Budi, S. Pd.</td>
-                                        <td>Matematika</td>
-                                        <td>Senin</td>
-                                        <td>08.00 - 10.00</td>
-                                        <td>
-                                            <div class="d-flex align-items-center justify-content-sm-center justify-content-start">
-                                                <a href="#" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
-                                                    <i class="fa fa-pen"></i>
-                                                </a>
-                                                <button id="" route="" onclick="" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 <tbody>
 
                                 </tbody>
                             </table>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="clearfix">
-                            <ul class="pagination pagination-sm m-0 float-right">
-                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
                         </div>
                     </div>
                     <!-- /.card-body -->
@@ -111,7 +203,8 @@
             <!-- /.col -->
         </div>
         <!-- /.row -->
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 </section>
 <!-- /.content -->
 @endsection

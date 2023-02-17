@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\ClassRoomController;
+use App\Http\Controllers\LessonScheduleController;
 use App\Http\Controllers\SchoolYearController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectsController;
@@ -76,43 +77,14 @@ Route::prefix('data')->name('data.')->group(function () {
         Route::delete('{class_room}', 'destroy')->name('destroy');
     });
 });
-Route::prefix('lesson-schedule')->name('lesson-schedule.')->group(function () {
-    Route::get('', function () {
-        return view('main.lesson-schedule.index');
-    })->name('index');
-    Route::get('create', function (Request $request) {
-        $request->validate([
-            'school_year' => 'required',
-            'semester' => 'required',
-            'teacher' => 'required'
-        ]);
-        $school_year = explode('|', $request->school_year);
-        $teacher = explode('|', $request->teacher);
-        $data = [
-            'school_year' => [
-                'id' => $school_year[0],
-                'name' => $school_year[1]
-            ],
-            'semester' => $request->semester,
-            'teacher' => [
-                'id' => $teacher[0],
-                'name' => $teacher[1]
-            ],
-        ];
-
-        return view('main.lesson-schedule.create', compact('data'));
-    })->name('create');
-    Route::post('store', function (Request $request) {
-        $request->validate([
-            'school_year_id' => 'required',
-            'teacher_id' => 'required',
-            'class_id' => 'required',
-            'day_id' => 'required',
-            'time' => 'required'
-        ]);
-
-        return "success";
-    })->name('store');
+Route::prefix('lesson-schedule')->name('lesson-schedule.')->controller(LessonScheduleController::class)->group(function () {
+    Route::get('', 'index')->name('index');
+    Route::post('get-data', 'getData')->name('getData');
+    Route::get('create', 'create')->name('create');
+    Route::post('', 'store')->name('store');
+    Route::get('edit/{lesson_schedule}', 'edit')->name('edit');
+    Route::put('{lesson_schedule}', 'update')->name('update');
+    Route::delete('{lesson_schedule}', 'destroy')->name('destroy');
 });
 Route::prefix('grade')->name('grade.')->group(function () {
     Route::get('', function () {

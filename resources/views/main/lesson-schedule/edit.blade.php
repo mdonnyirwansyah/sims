@@ -53,13 +53,14 @@ $(document).ready(function() {
                 @endif
                 <div class="card">
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('lesson-schedule.store') }}" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" action="{{ route('lesson-schedule.update', $data['lessonSchedule']->id) }}" method="post" enctype="multipart/form-data">
+                            @method('put')
                             @csrf
                             <div class="form-group row">
                                 <label for="school_year" class="col-sm-3 col-form-label">Tahun Pelajaran</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('school_year_id') is-invalid @enderror" id="school_year" value="{{ $data['schoolYear']->name }}" readonly>
-                                    <input type="hidden" name="school_year_id" value="{{ $data['schoolYear']->id }}">
+                                    <input type="text" class="form-control @error('school_year_id') is-invalid @enderror" id="school_year" value="{{ $data['lessonSchedule']->school_year->name }}" readonly>
+                                    <input type="hidden" name="school_year_id" value="{{ $data['lessonSchedule']->school_year->id }}">
                                     @error('school_year_id')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -70,7 +71,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="semester" class="col-sm-3 col-form-label">Semester</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('semester') is-invalid @enderror" id="semester" name="semester" value="{{ $data['semester'] }}" readonly>
+                                    <input type="text" class="form-control @error('semester') is-invalid @enderror" id="semester" name="semester" value="{{ $data['lessonSchedule']->semester }}" readonly>
                                     @error('semester')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -81,8 +82,8 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="teacher" class="col-sm-3 col-form-label">Guru</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('teacher_id') is-invalid @enderror" id="teacher" value="{{ $data['teacher']->user->name }}" readonly>
-                                    <input type="hidden" name="teacher_id" value="{{ $data['teacher']->id }}">
+                                    <input type="text" class="form-control @error('teacher_id') is-invalid @enderror" id="teacher" value="{{ $data['lessonSchedule']->teacher->user->name }}" readonly>
+                                    <input type="hidden" name="teacher_id" value="{{ $data['lessonSchedule']->teacher_id }}">
                                     @error('teacher_id')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -93,8 +94,8 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select type="text" class="form-control @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
-                                        <option selected disabled>Pilih Kelas</option>
+                                    <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" value="{{ old('class_room_id') ?? $data['lessonSchedule']->class_room_id }}">
+                                        <option disabled>Pilih Kelas</option>
                                         @foreach ($data['classRooms'] as $classRoom)
                                             <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
                                         @endforeach
@@ -109,8 +110,8 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="subjects_id" class="col-sm-3 col-form-label">Mata Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('subjects_id') is-invalid @enderror" id="subjects_id" name="subjects_id">
-                                        <option selected disabled>Pilih Mata Pelajaran</option>
+                                    <select class="form-control select2 @error('subjects_id') is-invalid @enderror" id="subjects_id" name="subjects_id" value="{{ old('subjects_id') ?? $data['lessonSchedule']->subjects_id }}">
+                                        <option disabled>Pilih Mata Pelajaran</option>
                                         @foreach ($data['subjects'] as $subjects)
                                             <option value="{{ $subjects->id }}">{{ $subjects->name }}</option>
                                         @endforeach
@@ -125,8 +126,8 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="day_id" class="col-sm-3 col-form-label">Hari <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('day_id') is-invalid @enderror" id="day_id" name="day_id">
-                                        <option selected disabled>Pilih Hari</option>
+                                    <select class="form-control select2 @error('day_id') is-invalid @enderror" id="day_id" name="day_id" value="{{ old('day_id') ?? $data['lessonSchedule']->day_id }}">
+                                        <option disabled>Pilih Hari</option>
                                         @foreach ($data['days'] as $day)
                                             <option value="{{ $day->id }}">{{ $day->name }}</option>
                                         @endforeach
@@ -141,7 +142,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="start_time" class="col-sm-3 col-form-label">Jam Mulai <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="time" class="form-control @error('start_time') is-invalid @enderror" id="start_time" name="start_time" value="{{ old('start_time') }}">
+                                    <input type="time" class="form-control @error('start_time') is-invalid @enderror" id="start_time" name="start_time" value="{{ old('start_time') ?? $data['lessonSchedule']->start_time }}">
                                     @error('start_time')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -152,7 +153,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="end_time" class="col-sm-3 col-form-label">Jam Selesai <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="time" class="form-control @error('end_time') is-invalid @enderror" id="end_time" name="end_time" value="{{ old('end_time') }}">
+                                    <input type="time" class="form-control @error('end_time') is-invalid @enderror" id="end_time" name="end_time"  value="{{ old('end_time') ?? $data['lessonSchedule']->end_time }}">
                                     @error('end_time')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -163,7 +164,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <div class="col-sm-12">
                                     <a href="{{ route('lesson-schedule.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
-                                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                    <button type="submit" class="btn btn-primary float-right">Simpan</button>
                                 </div>
                             </div>
                         </form>

@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             SchoolYearSeeder::class,
             SubjectsSeeder::class,
-            ClassRoomSeeder::class
+            ClassRoomSeeder::class,
+            DaySeeder::class,
+            LessonScheduleSeeder::class
         ]);
     }
 }
