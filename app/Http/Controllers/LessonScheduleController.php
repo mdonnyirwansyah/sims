@@ -44,7 +44,7 @@ class LessonScheduleController extends Controller
     public function getData(Request $request)
     {
         if ($request->school_year_id || $request->semester || $request->teacher_id) {
-            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->orWhere('semester', $request->semester)->orWhere('teacher_id', $request->teacher_id)->orderBy('day_id', 'ASC')->get();
+            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('teacher_id', $request->teacher_id)->orderBy('day_id', 'ASC')->get();
         } else {
             $lessonSchedules = LessonSchedule::orderBy('day_id', 'ASC')->get();
         }
@@ -86,22 +86,22 @@ class LessonScheduleController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param  \App\Http\Requests\LessonScheduleCreateRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(LessonScheduleCreateRequest $request)
+    public function create()
     {
-        $schoolYear = SchoolYear::findOrFail($request->school_year_id);
-        $teacher = Teacher::findOrFail($request->teacher_id);
-        $classRooms = ClassRoom::where('school_year_id', $request->school_year_id)->orderBy('name', 'DESC')->get();
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
+        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
+            $query->orderBy('name', 'ASC');
+        }])->get();
+        $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
         $days = Day::orderBy('id', 'ASC')->get();
         
         $data = [
             'title' => 'Tambah Jadwal Pelajaran',
-            'schoolYear' => $schoolYear,
-            'semester' => $request->semester,
-            'teacher' => $teacher,
+            'schoolYears' => $schoolYears,
+            'teachers' => $teachers,
             'classRooms' => $classRooms,
             'subjects' => $subjects,
             'days' => $days
@@ -144,13 +144,19 @@ class LessonScheduleController extends Controller
      */
     public function edit(LessonSchedule $lessonSchedule)
     {
-        $classRooms = ClassRoom::where('school_year_id', $lessonSchedule->school_year_id)->orderBy('name', 'DESC')->get();
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
+        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
+            $query->orderBy('name', 'ASC');
+        }])->get();
+        $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
         $days = Day::orderBy('id', 'ASC')->get();
-
+        
         $data = [
-            'title' => 'Edit Jadwal Pelajaran',
+            'title' => 'Tambah Jadwal Pelajaran',
             'lessonSchedule' => $lessonSchedule,
+            'schoolYears' => $schoolYears,
+            'teachers' => $teachers,
             'classRooms' => $classRooms,
             'subjects' => $subjects,
             'days' => $days

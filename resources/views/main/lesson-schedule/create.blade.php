@@ -56,10 +56,14 @@ $(document).ready(function() {
                         <form class="form-horizontal" action="{{ route('lesson-schedule.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group row">
-                                <label for="school_year" class="col-sm-3 col-form-label">Tahun Pelajaran</label>
+                                <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('school_year_id') is-invalid @enderror" id="school_year" value="{{ $data['schoolYear']->name }}" readonly>
-                                    <input type="hidden" name="school_year_id" value="{{ $data['schoolYear']->id }}">
+                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
+                                        <option selected disabled>Pilih Tahun Pelajaran</option>
+                                        @foreach ($data['schoolYears'] as $schoolYear)
+                                            <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
+                                        @endforeach
+                                    </select>
                                     @error('school_year_id')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -68,9 +72,13 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="semester" class="col-sm-3 col-form-label">Semester</label>
+                                <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('semester') is-invalid @enderror" id="semester" name="semester" value="{{ $data['semester'] }}" readonly>
+                                    <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester">
+                                        <option selected disabled>Pilih Semester</option>
+                                        <option value="1 (satu)">1 (satu)</option>
+                                        <option value="2 (dua)">2 (dua)</option>
+                                    </select>
                                     @error('semester')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -79,10 +87,14 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="teacher" class="col-sm-3 col-form-label">Guru</label>
+                                <label for="teacher" class="col-sm-3 col-form-label">Guru <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control @error('teacher_id') is-invalid @enderror" id="teacher" value="{{ $data['teacher']->user->name }}" readonly>
-                                    <input type="hidden" name="teacher_id" value="{{ $data['teacher']->id }}">
+                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher" name="teacher">
+                                        <option selected disabled>Pilih Guru</option>
+                                        @foreach ($data['teachers'] as $teacher)
+                                            <option value="{{ $teacher->id }}">{{ $teacher->nip. ' - ' .$teacher->user->name }}</option>
+                                        @endforeach
+                                    </select>
                                     @error('teacher_id')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -93,7 +105,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select type="text" class="form-control @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
+                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
                                         <option selected disabled>Pilih Kelas</option>
                                         @foreach ($data['classRooms'] as $classRoom)
                                             <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>

@@ -56,7 +56,7 @@ $(document).ready(function() {
                         <form class="form-horizontal" action="{{ route('data.class-room.store') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group row">
-                                <label for="school_year" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
+                                <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
                                         <option selected disabled>Pilih Tahun Pelajaran</option>
