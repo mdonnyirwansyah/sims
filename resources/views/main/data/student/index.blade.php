@@ -133,7 +133,11 @@ function handleDelete(id) {
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <a href="{{ route('data.student.create') }}" class="btn btn-primary">Tambah</a>
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="{{ route('data.student.create') }}" class="btn btn-primary float-right">Tambah</a>
+                            </div>
+                        </div>
                         <hr>
                         <div>
                             <table id="students-table" class="table table-bordered table-striped" style="width:100%">
