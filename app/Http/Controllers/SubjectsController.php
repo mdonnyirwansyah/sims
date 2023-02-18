@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SubjectsStoreRequest;
 use App\Http\Requests\SubjectsUpdateRequest;
+use App\Models\ClassRoom;
 use App\Models\Subjects;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -135,5 +136,30 @@ class SubjectsController extends Controller
         }
 
         return response()->json(['ok' => 'Data berhasil dihapus!']);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showByClassRoom(Request $request)
+    {
+        $classRoom = ClassRoom::find($request->class_room_id);
+        $lesson_schedules = $classRoom->lesson_schedules()->with(['subjects' => function ($query) {
+            $query->orderBy('group', 'ASC')->orderBy('name', 'ASC');
+        }])->get();
+
+        $data = [];
+
+        foreach ($lesson_schedules as $index => $lesson_schedule) {
+            $data[$index] = [
+                'id' => $lesson_schedule->subjects->id,
+                'name' => $lesson_schedule->subjects->name
+            ];
+        }
+
+        return response()->json($data);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassRoom;
 use App\Models\Student;
 use App\Models\User;
 use App\Http\Requests\StudentStoreRequest;
@@ -352,5 +353,30 @@ class StudentController extends Controller
         }
 
         return response()->json(['ok' => 'Data berhasil dihapus!']);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showByClassRoom(Request  $request)
+    {
+        $classRoom = ClassRoom::find($request->class_room_id);
+        $students = $classRoom->students()->with(['user' => function ($query) {
+            $query->orderBy('name', 'ASC');
+        }])->get();
+
+        $data = [];
+
+        foreach ($students as $index => $student) {
+            $data[$index] = [
+                'id' => $student->id,
+                'name' => $student->user->name
+            ];
+        }
+
+        return response()->json($data);
     }
 }

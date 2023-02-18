@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\ClassRoomController;
+use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LessonScheduleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SchoolYearController;
@@ -37,6 +38,7 @@ Route::middleware('auth')->group(function () {
             Route::get('edit/{student}', 'edit')->name('edit');
             Route::put('{student}', 'update')->name('update');
             Route::delete('{student}', 'destroy')->name('destroy');
+            Route::get('show-by-class-room', 'showByClassRoom')->name('show-by-class-room');
         });
         Route::prefix('teacher')->name('teacher.')->controller(TeacherController::class)->group(function () {
             Route::get('', 'index')->name('index');
@@ -64,6 +66,7 @@ Route::middleware('auth')->group(function () {
             Route::get('edit/{subjects}', 'edit')->name('edit');
             Route::put('{subjects}', 'update')->name('update');
             Route::delete('{subjects}', 'destroy')->name('destroy');
+            Route::get('show-by-class-room', 'showByClassRoom')->name('show-by-class-room');
         });
         Route::prefix('class-room')->name('class-room.')->controller(ClassRoomController::class)->group(function () {
             Route::get('', 'index')->name('index');
@@ -75,6 +78,7 @@ Route::middleware('auth')->group(function () {
             Route::get('edit/{class_room}', 'edit')->name('edit');
             Route::put('{class_room}', 'update')->name('update');
             Route::delete('{class_room}', 'destroy')->name('destroy');
+            Route::get('show-by-school-year', 'showBySchoolYear')->name('show-by-school-year');
         });
     });
     Route::prefix('lesson-schedule')->name('lesson-schedule.')->controller(LessonScheduleController::class)->group(function () {
@@ -86,34 +90,14 @@ Route::middleware('auth')->group(function () {
         Route::put('{lesson_schedule}', 'update')->name('update');
         Route::delete('{lesson_schedule}', 'destroy')->name('destroy');
     });
-    Route::prefix('grade')->name('grade.')->group(function () {
-        Route::get('', function () {
-            return view('main.grade.index');
-        })->name('index');
-        Route::get('create', function (Request $request) {
-            $request->validate([
-                'school_year' => 'required',
-                'semester' => 'required',
-                'class' => 'required',
-                'type' => 'required',
-            ]);
-
-            $school_year = explode('|', $request->school_year);
-            $class = explode('|', $request->class);
-            $data = [
-                'school_year' => [
-                    'id' => $school_year[0],
-                    'name' => $school_year[1]
-                ],
-                'semester' => $request->semester,
-                'class' => [
-                    'id' => $class[0],
-                    'name' => $class[1]
-                ],
-                'type' => $request->type
-            ];
-            return view('main.grade.create', compact('data'));
-        })->name('create');
+    Route::prefix('grade')->name('grade.')->controller(GradeController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('get-data', 'getData')->name('getData');
+        Route::get('create', 'create')->name('create');
+        Route::post('', 'store')->name('store');
+        Route::get('edit/{grade}', 'edit')->name('edit');
+        Route::put('{grade}', 'update')->name('update');
+        Route::delete('{grade}', 'destroy')->name('destroy');
     });
     Route::prefix('report')->name('report.')->group(function () {
         Route::get('', function () {

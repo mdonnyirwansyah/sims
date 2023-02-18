@@ -36,4 +36,12 @@ class ClassRoom extends Model
     {
         return $this->belongsToMany(Student::class)->withTimestamps();
     }
+
+    /**
+     * Get the lesson_schedules for the class room.
+     */
+    public function lesson_schedules()
+    {
+        return $this->hasMany(LessonSchedule::class);
+    }
 }

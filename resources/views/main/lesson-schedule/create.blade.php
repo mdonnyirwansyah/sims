@@ -87,9 +87,9 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="teacher" class="col-sm-3 col-form-label">Guru <span class="text-danger">*</span></label>
+                                <label for="teacher_id" class="col-sm-3 col-form-label">Guru <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher" name="teacher">
+                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
                                         <option selected disabled>Pilih Guru</option>
                                         @foreach ($data['teachers'] as $teacher)
                                             <option value="{{ $teacher->id }}">{{ $teacher->nip. ' - ' .$teacher->user->name }}</option>

@@ -219,4 +219,17 @@ class ClassRoomController extends Controller
 
         return response()->json(['ok' => 'Data berhasil dihapus!']);
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showBySchoolYear(Request  $request)
+    {
+        $classRooms = ClassRoom::select(['id', 'name'])->where('school_year_id', $request->school_year_id)->orderBy('class', 'ASC')->orderBy('name', 'ASC')->get();
+
+        return response()->json($classRooms);
+    }
 }
