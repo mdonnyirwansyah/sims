@@ -3,6 +3,7 @@
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\LessonScheduleController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SchoolYearController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectsController;
@@ -23,9 +24,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', BerandaController::class)->name('beranda');
-    Route::get('profile', function () {
-        return view('main.profile.student.index');
-    })->name('profile');
+    Route::prefix('profile')->name('profile.')->controller(ProfileController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('', 'index')->name('index');
+    });
     Route::prefix('data')->name('data.')->group(function () {
         Route::prefix('student')->name('student.')->controller(StudentController::class)->group(function () {
             Route::get('', 'index')->name('index');

@@ -38,16 +38,22 @@
                 <div class="card card-primary card-outline">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            <img class="profile-user-img img-fluid img-circle"
-                                src="{{ asset('dist/img/profile-picture.png') }}"
+                            <img style="" class="profile-user-img img-fluid img-circle"
+                                src="{!! $user->user_detail->profile_picture ? asset('storage/profile-pictures/'. $user->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}"
                                 alt="User profile picture">
                         </div>
 
-                        <h3 class="profile-username text-center">User</h3>
+                        <h3 class="profile-username text-center">{{ $user->name }}</h3>
 
-                        <p class="text-muted text-center">---</p>
+                        <p class="text-muted text-center">{{ $user->student->nisn }}</p>
 
-                        <a href="#" class="btn btn-danger btn-block"><b>Logout</b></a>
+                        <a class="btn btn-danger btn-block" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                          </a>
+                          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                          </form>
                     </div>
                     <!-- /.card-body -->
                 </div>
@@ -77,51 +83,102 @@
                                     </div>
                                     <hr>
                                     <div class="form-group row">
-                                        <label for="name" class="col-sm-3 col-form-label">Nama</label>
+                                        <label for="name" class="col-sm-3 col-form-label">Nama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="name" name="name">
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $user->name }}">
+                                            @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="nis" class="col-sm-3 col-form-label">NIS</label>
+                                        <label for="nis" class="col-sm-3 col-form-label">NIS <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="nis" name="nis">
+                                            <input type="text" class="form-control @error('nis') is-invalid @enderror" id="nis" name="nis" value="{{ old('nis') ?? $user->student->nis }}">
+                                            @error('nis')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="nisn" class="col-sm-3 col-form-label">NISN</label>
+                                        <label for="nisn" class="col-sm-3 col-form-label">NISN <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="nisn" name="nisn">
+                                            <input type="text" class="form-control @error('nisn') is-invalid @enderror" id="nisn" name="nisn" value="{{ old('nisn') ?? $user->student->nisn }}">
+                                            @error('nisn')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="date_of_birth" class="col-sm-3 col-form-label">Tanggal Lahir</label>
+                                        <label for="place_of_birth" class="col-sm-3 col-form-label">Tempat Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth">
+                                            <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') ?? $user->user_detail->place_of_birth }}">
+                                            @error('place_of_birth')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="place_of_birth" class="col-sm-3 col-form-label">Tempat Lahir</label>
+                                        <label for="date_of_birth" class="col-sm-3 col-form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="place_of_birth" name="place_of_birth">
+                                            <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') ?? $user->user_detail->date_of_birth }}">
+                                            @error('date_of_birth')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="ganeder" class="col-sm-3 col-form-label">Jenis Kelamin</label>
+                                        <label for="gender" class="col-sm-3 col-form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control" id="ganeder" name="ganeder"></select>
+                                            <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" value="{{ $user->user_detail->gender }}">
+                                                <option disabled>Pilih Jenis Kelamin</option>
+                                                <option value="Male">Laki-laki</option>
+                                                <option value="Female">Perempuan</option>
+                                            </select>
+                                            @error('gender')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="religion" class="col-sm-3 col-form-label">Agama</label>
+                                        <label for="religion" class="col-sm-3 col-form-label">Agama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control" id="religion" name="religion"></select>
+                                            <select class="form-control @error('religion') is-invalid @enderror" id="religion" name="religion" value="{{ old('religion') ?? $user->user_detail->gender }}">
+                                                <option disabled>Pilih Agama</option>
+                                                <option value="Islam">Islam</option>
+                                                <option value="Kristen">Kristen</option>
+                                                <option value="Hindu">Hindu</option>
+                                                <option value="Budha">Budha</option>
+                                                <option value="Kong Hu Chu">Kong Hu Chu</option>
+                                            </select>
+                                            @error('religion')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="profile_picture" class="col-sm-3 col-form-label">Foto Profil</label>
                                         <div class="col-sm-9">
-                                            <input type="file" class="form-control" id="profile_picture" name="profile_picture">
+                                            <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" id="profile_picture" name="profile_picture">
+                                            @error('profile_picture')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -131,15 +188,15 @@
                                     </div>
                                     <hr>
                                     <div class="form-group row">
-                                        <label for="class_at" class="col-sm-3 col-form-label">Di Kelas</label>
+                                        <label for="class_at" class="col-sm-3 col-form-label">Di Kelas <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="class_at" name="class_at">
+                                            <input type="text" class="form-control" id="class_at" name="class_at" value="{{ $user->student->class_at }}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="register_date" class="col-sm-3 col-form-label">Pada Tanggal</label>
+                                        <label for="registered_at" class="col-sm-3 col-form-label">Pada Tanggal <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" class="form-control" id="register_date" name="register_date">
+                                            <input type="date" class="form-control" id="registered_at" name="registered_at" value="{{ $user->student->registered_at }}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -153,21 +210,36 @@
                             <div class="tab-pane" id="address">
                                 <form class="form-horizontal">
                                     <div class="form-group row">
-                                        <label for="address" class="col-sm-3 col-form-label">Alamat</label>
+                                        <label for="address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control" id="address" name="address"></textarea>
+                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $user->address->address }}</textarea>
+                                            @error('address')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="email" class="col-sm-3 col-form-label">Email</label>
+                                        <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control" id="email" name="email">
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $user->address->email }}">
+                                            @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="phone" class="col-sm-3 col-form-label">No. HP</label>
+                                        <label for="phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="phone" name="phone">
+                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $user->address->phone }}">
+                                            @error('phone')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -187,16 +259,28 @@
                                         </div>
                                     </div>
                                     <hr>
+                                    <input type="hidden" name="father[type]" value="Father">
                                     <div class="form-group row">
-                                        <label for="father_name" class="col-sm-3 col-form-label">Ayah</label>
+                                        <label for="father_name" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="father_name" name="father_name">
+                                            <input type="text" class="form-control @error('father.name') is-invalid @enderror" id="father_name" name="father[name]" value="{{ old('father.name') ?? $user->student->families[0]->name }}">
+                                            @error('father.name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
+                                    <input type="hidden" name="mother[type]" value="Mother">
                                     <div class="form-group row">
-                                        <label for="mother_name" class="col-sm-3 col-form-label">Ibu</label>
+                                        <label for="mother_name" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="mother_name" name="mother_name">
+                                            <input type="text" class="form-control @error('mother.name') is-invalid @enderror" id="mother_name" name="mother[name]" value="{{ old('mother.name') ?? $user->student->families[1]->name }}">
+                                            @error('mother.name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -206,15 +290,25 @@
                                     </div>
                                     <hr>
                                     <div class="form-group row">
-                                        <label for="father_occupation" class="col-sm-3 col-form-label">Ayah</label>
+                                        <label for="father_occupation" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="father_occupation" name="father_occupation">
+                                            <input type="text" class="form-control @error('father.occupation') is-invalid @enderror" id="father_occupation" name="father[occupation]" value="{{ old('father.occupation') ?? $user->student->families[0]->occupation }}">
+                                            @error('father.occupation')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="mother_occupation" class="col-sm-3 col-form-label">Ibu</label>
+                                        <label for="mother_occupation" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="mother_occupation" name="mother_occupation">
+                                            <input type="text" class="form-control @error('mother.occupation') is-invalid @enderror" id="mother_occupation" name="mother[occupation]" value="{{ old('mother.occupation') ?? $user->student->families[1]->occupation }}">
+                                            @error('mother.occupation')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -224,15 +318,25 @@
                                     </div>
                                     <hr>
                                     <div class="form-group row">
-                                        <label for="parents_address" class="col-sm-3 col-form-label">Alamat</label>
+                                        <label for="father_address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control" id="parents_address" name="parents_address"></textarea>
+                                            <textarea class="form-control @error('father.address') is-invalid @enderror" id="father_address" name="father[address]">{{ old('father.address') ?? $user->student->families[0]->address->address }}</textarea>
+                                            @error('father.address')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="parents_phone" class="col-sm-3 col-form-label">No. HP</label>
+                                        <label for="father_phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="parents_phone" name="parents_phone">
+                                            <input type="text" class="form-control @error('father.phone') is-invalid @enderror" id="father_phone" name="father[phone]" value="{{ old('father.phone') ?? $user->student->families[0]->address->phone }}">
+                                            @error('father.phone')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -246,28 +350,49 @@
 
                             <div class="tab-pane" id="guardian">
                                 <form class="form-horizontal">
+                                    <input type="hidden" name="guardian[type]" value="Guardian">
                                     <div class="form-group row">
-                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama</label>
+                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama {!! $user->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="guardian_name" name="guardian_name">
+                                            <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') ?? $user->student->families[2]->name ?? '' }}">
+                                            @error('guardian.name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan</label>
+                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan {!! $user->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="guardian_occupation" name="guardian_occupation">
+                                            <input type="text" class="form-control @error('guardian.occupation') is-invalid @enderror" id="guardian_occupation" name="guardian[occupation]" value="{{ old('guardian.occupation') ?? $user->student->families[2]->occupation ?? '' }}">
+                                            @error('guardian.occupation')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat</label>
+                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat {!! $user->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control" id="guardian_address" name="guardian_address"></textarea>
+                                            <textarea class="form-control @error('guardian.address') is-invalid @enderror" id="guardian_address" name="guardian[address]">{{ old('guardian.address') ?? $user->student->families[2]->address->address ?? '' }}</textarea>
+                                            @error('guardian.address')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP</label>
+                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP {!! $user->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="guardian_phone" name="guardian_phone">
+                                            <input type="text" class="form-control @error('guardian.phone') is-invalid @enderror" id="guardian_phone" name="guardian[phone]" value="{{ old('guardian.phone') ?? $user->student->families[2]->address->phone ?? '' }}">
+                                            @error('guardian.phone')
+                                            <span class="invalid-feedback" role="alert">
+                                                <small>{{ $message }}</small>
+                                            </span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="form-group row">

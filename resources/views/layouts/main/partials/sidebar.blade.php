@@ -10,10 +10,10 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="{{ asset('dist/img/profile-picture.png') }}" class="img-circle elevation-2" alt="User Image">
+                <img src="{!! Auth::user()->user_detail->profile_picture ? asset('storage/profile-pictures/'.  Auth::user()->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" class="img-circle elevation-2" alt="User profile picture">
             </div>
             <div class="info">
-                <a href="{{ route('profile') }}" class="d-block">{{ Auth::user()->name }}</a>
+                <a href="{{ route('profile.index') }}" class="d-block">{{ Auth::user()->name }}</a>
             </div>
         </div>
 
@@ -29,7 +29,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
+                    <a href="{{ route('profile.index') }}" class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-circle"></i>
                         <p>Profil</p>
                     </a>
