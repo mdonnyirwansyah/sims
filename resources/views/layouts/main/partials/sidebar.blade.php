@@ -13,7 +13,7 @@
                 <img src="{{ asset('dist/img/profile-picture.png') }}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="{{ route('profile') }}" class="d-block">User</a>
+                <a href="{{ route('profile') }}" class="d-block">{{ Auth::user()->name }}</a>
             </div>
         </div>
 
