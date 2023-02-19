@@ -34,6 +34,8 @@ class Report extends Model
      */
     public function grades()
     {
-        return $this->hasMany(Grade::class);
+        return $this->hasMany(Grade::class)->whereHas('subjects')->with(['subjects' => function ($query) {
+            $query->orderBy('group', 'ASC');
+        }]);
     }
 }

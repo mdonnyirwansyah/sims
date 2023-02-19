@@ -5,6 +5,7 @@ use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LessonScheduleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SchoolYearController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectsController;
@@ -99,26 +100,9 @@ Route::middleware('auth')->group(function () {
         Route::put('{report}', 'update')->name('update');
         Route::delete('{report}', 'destroy')->name('destroy');
     });
-    Route::prefix('report')->name('report.')->group(function () {
-        Route::get('', function () {
-            return view('main.report.student.result');
-        })->name('index');
-        Route::get('result', function (Request $request) {
-            $request->validate([
-                'class' => 'required',
-                'semester' => 'required'
-            ]);
-
-            $class = explode('|', $request->class);
-            $data = [
-                'class' => [
-                    'id' => $class[0],
-                    'name' => $class[1]
-                ],
-                'semester' => $request->semester
-            ];
-
-            return view('main.report.student.result', compact('data'));
-        })->name('result');
+    Route::prefix('report')->name('report.')->controller(ReportController::class)->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('get-data', 'getData')->name('getData');
+        Route::get('show/{report}', 'show')->name('show');
     });
 });

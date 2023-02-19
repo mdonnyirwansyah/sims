@@ -36,4 +36,12 @@ class Student extends Model
     {
         return $this->belongsToMany(ClassRoom::class);
     }
+
+    /**
+     * Get the reports for the student.
+     */
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }

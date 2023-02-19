@@ -1,13 +1,115 @@
 @extends('layouts.main.index')
 
-@section('title', 'E-Raport')
+@section('title', $data['title'])
+
+@push('stylesheet')
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<!-- DataTables -->
+<link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/datatables-rowreorder/css/rowReorder.bootstrap4.min.css') }}">
+@endpush
 
 @push('javascript')
-@if(session()->has('status'))
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+<!-- DataTables -->
+<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script>
-  toastr.success("{{ __('Successfully saved!') }}", 'Notification,');
+$(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
+    $('#filter').change(function (e) {
+        reports.draw();
+        e.preventDefault();
+    });
+    var reports = $('#reports-table').DataTable({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        responsive: true,
+        rowReorder: true,
+        ajax: {
+            url: '{{ route('report.getData') }}',
+            type: 'post',
+            data: function (d) {
+                d.school_year_id = $('#school_year_id').val();
+                d.class_room_id = $('#class_room_id').val();
+                d.semester = $('#semester').val();
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        },
+        columns: [
+            {
+                data: 'DT_RowIndex',
+                width: 50,
+                orderable: false,
+                searchable: false
+            },
+            {data: 'school_year', name: 'school_year'},
+            {data: 'class_room', name: 'class_room'},
+            {data: 'semester', name: 'semester'},
+            {data: 'student', name: 'student'},
+            {
+                data: 'action',
+                name: 'action',
+                width: 35,
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+
+    $('#school_year_id').change(function () {
+        $('#class_room_id').val(null).trigger('change');
+        handleClassRooms();
+        $('#class_room_id').prop('disabled', false);
+        $('#semester').prop('disabled', false);
+    });
+});
 </script>
-@endif
+
+<script>
+function handleClassRooms() {
+    $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{{ route('data.class-room.show-by-school-year') }}',
+            type: 'get',
+            data: function (params) {
+                var query = {
+                    school_year_id: $('#school_year_id').val()
+                }
+                return query;
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
+    });
+}
+</script>
 @endpush
 
 @section('content')
@@ -16,12 +118,12 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>E-Raport</h1>
+                <h1>{{ $data['title'] }}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item active">E-Raport</li>
+                    <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
         </div>
@@ -34,59 +136,46 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-body">
-                        <form>
-                            <div class="input-group mb-3">
+                    <div class="card-header">
+                        <form id="filter">
+                            <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-primary">Filter</button>
+                                    <button type="button" class="btn btn-default">Filter</button>
                                 </div>
                                 <!-- /btn-group -->
-                                <select class="form-control @error('school_year') is-invalid @enderror" name="school_year">
+                                <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
                                     <option selected disabled>Pilih Tahun Pelajaran</option>
-                                    <option value="1|2022/2023">2022/2023</option>
+                                    @foreach ($data['schoolYears'] as $schoolYear)
+                                        <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
+                                    @endforeach
                                 </select>
-                                <select class="form-control @error('class') is-invalid @enderror" name="class">
+                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
                                     <option selected disabled>Pilih Kelas</option>
-                                    <option value="1|XI IPS 1">XI IPS 1</option>
+                                </select>
+                                <select class="form-control select2 @error('semester') is-invalid @enderror"  id="semester" name="semester" disabled>
+                                    <option selected disabled>Pilih Semester</option>
+                                    <option value="1 (satu)">1 (satu)</option>
+                                    <option value="2 (dua)">2 (dua)</option>
                                 </select>
                             </div>
                         </form>
-                        <hr>
-                        <div>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10px">No</th>
-                                        <th>Tahun Pelajaran</th>
-                                        <th>Kelas</th>
-                                        <th>Siswa</th>
-                                        <th style="width: 40px">Aksi</th>
-                                    </tr>
-                                </thead>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>2022/2023</td>
-                                        <td>XI IPS 1</td>
-                                        <td>2174 - Ana</td>
-                                        <td>
-                                            <a href="#" class="btn btn-outline-success btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Lihat">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <tbody>
+                    </div>
+                    <div class="card-body">
+                        <table id="reports-table" class="table table-bordered table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">No</th>
+                                    <th>Tahun Pelajaran</th>
+                                    <th>Kelas</th>
+                                    <th>Semester</th>
+                                    <th>Siswa</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="clearfix">
-                            <ul class="pagination pagination-sm m-0 float-right">
-                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                     <!-- /.card-body -->
                 </div>
