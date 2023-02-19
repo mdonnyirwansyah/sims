@@ -17,17 +17,63 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
     $('#school_year_id').change(function () {
+        $('#class_room_id').val(null).trigger('change');
         handleClassRooms();
         $('#semester').prop('disabled', false);
         $('#class_room_id').prop('disabled', false);
         $('#type').prop('disabled', false);
     });
-    $('#school_year_id').change(function () {
-        handleStudents();
-    });
     $('#class_room_id').change(function () {
+        $('#student_id').val(null).trigger('change');
+        handleStudents();
         handleSubjects();
         $('#student_id').prop('disabled', false);
+    });
+    $('#form-action').submit(function (e) {
+        e.preventDefault();
+        $('#submit-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                    async function redirect() {
+                        let promise = new Promise(function (resolve, reject) {
+                            setTimeout(function () {
+                                resolve('{{ route("grade.index") }}'); 
+                            }, 3000);
+                        });
+                        window.location.href = await promise;
+                    }
+                    redirect();
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-button').prop('disabled', false);
+                } else if (response.exist) {
+                    toastr.error(response.exist, 'Pemberitahuan,');
+                    $('#submit-button').prop('disabled', false);
+                } else {
+                    $('#failed').removeClass('d-none');
+                    $('#failed-message').empty();
+                    $('#failed-message').append(response.failed);
+                    $('#submit-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-button').prop('disabled', false);
+            }
+        });
     });
 });
 </script>
@@ -35,6 +81,7 @@ $(document).ready(function() {
 <script>
 function handleClassRooms() {
     $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
         theme: 'bootstrap4',
         ajax: {
             url: '{{ route('data.class-room.show-by-school-year') }}',
@@ -61,6 +108,7 @@ function handleClassRooms() {
 }
 function handleStudents() {
     $('#student_id').select2({
+        placeholder: 'Pilih Siswa',
         theme: 'bootstrap4',
         ajax: {
             url: '{{ route('data.student.show-by-class-room') }}',
@@ -97,7 +145,7 @@ function handleSubjects() {
             if (response.length > 0) {
                 $('#subjects').empty();
                 $.each(response, function (key, value) {
-                    $('#subjects').append(`<div class="form-group row"><label for="subject" class="col-sm-3 col-form-label">${value.name} <span class="text-danger">*</span></label><input type="hidden" name="subjects[${value.id}][\'id\']" value="${value.id}"><div class="col-sm-9"><input type="number" class="form-control" id="subject" name="subjects[${value.id}][\'value\']" placeholder="Nilai"></div></div><div class="form-group row"><label class="col-sm-3 col-form-label"></label><div class="col-sm-9"><textarea class="form-control" name="subjects[${value.id}][\'description\']" placeholder="Keterangan"></textarea></div></div>`);
+                    $('#subjects').append(`<div class="form-group row"><label for="subjects" class="col-sm-3 col-form-label">${value.name} <span class="text-danger">*</span></label><input type="hidden" name="subjects[${value.id}][subjects_id]" value="${value.id}"><div class="col-sm-9"><input type="number" class="form-control" id="subjects_${key}_value" name="subjects[${value.id}][value]" placeholder="Nilai"><small class="invalid-feedback subjects_${key}_value_err"></small></div></div><div class="form-group row"><label class="col-sm-3 col-form-label"></label><div class="col-sm-9"><textarea id="subjects_${key}_description" class="form-control" id="subjects_${key}_description" name="subjects[${value.id}][description]" placeholder="Keterangan"></textarea><small class="invalid-feedback subjects_${key}_description_err"></small></div></div>`);
                 });
             } 
             if (response.length === 0) {
@@ -106,7 +154,21 @@ function handleSubjects() {
             if (!response.length > 0 && !response.length === 0) {
                 toastr.error('Something when wrong...', 'Pemberitahuan,');
             }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
         }
+    });
+}
+function printErrorMsg (msg) {
+    $.each(msg, function (key, value) {
+        var key = key.replace(/[^a-zA-Z0-9]/g, '_');
+        $('#'+key).addClass('is-invalid');
+        $('.'+key+'_err').text(value);
+        $('#'+key+'_err').text(value);
+        $('#'+key).change(function () {
+            $('#'+key).removeClass('is-invalid');
+        });
     });
 }
 </script>
@@ -136,111 +198,72 @@ function handleSubjects() {
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                @if($message = Session::get('failed'))
-                <div class="alert alert-danger alert-dismissible">
+                <div id="failed" class="d-none alert alert-danger alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
-                    {{ $message }}
+                    <p id="failed-message"></p>
                 </div>
-                @endif
                 <div class="card">
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('grade.store') }}" method="post" enctype="multipart/form-data">
-                            @csrf
+                        <form id="form-action" class="form-horizontal" action="{{ route('grade.store') }}" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
+                                    <select class="form-control select2" id="school_year_id" name="school_year_id">
                                         <option selected disabled>Pilih Tahun Pelajaran</option>
                                         @foreach ($data['schoolYears'] as $schoolYear)
                                             <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('school_year_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
+                                    <small class="invalid-feedback school_year_id_err"></small>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester" disabled>
+                                    <select class="form-control select2" id="semester" name="semester" disabled>
                                         <option selected disabled>Pilih Semester</option>
                                         <option value="1 (satu)">1 (satu)</option>
                                         <option value="2 (dua)">2 (dua)</option>
                                     </select>
-                                    @error('semester')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
+                                    <small class="invalid-feedback semester_err"></small>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
+                                    <select class="form-control select2" id="class_room_id" name="class_room_id" disabled>
                                         <option selected disabled>Pilih Kelas</option>
-                                        @foreach ($data['classRooms'] as $classRoom)
-                                            <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
-                                        @endforeach
                                     </select>
-                                    @error('class_room_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
+                                    <small class="invalid-feedback class_room_id_err"></small>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="type" class="col-sm-3 col-form-label">Jenis <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('type') is-invalid @enderror" id="type" name="type" disabled>
+                                    <select class="form-control select2" id="type" name="type" disabled>
                                         <option selected disabled>Pilih Jenis</option>
                                         <option value="Pengetahuan">Pengetahuan</option>
                                         <option value="Keterampilan">Keterampilan</option>
                                     </select>
-                                    @error('semester')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
+                                    <small class="invalid-feedback type_err"></small>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="student_id" class="col-sm-3 col-form-label">Siswa <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('student_id') is-invalid @enderror" id="student_id" name="student_id" disabled>
+                                    <select class="form-control select2" id="student_id" name="student_id" disabled>
                                         <option selected disabled>Pilih Siswa</option>
                                     </select>
-                                    @error('student_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
+                                    <small class="invalid-feedback student_id_err"></small>
                                 </div>
                             </div>
                             <div id="subjects">
-                                {{-- <div class="form-group row">
-                                    <label for="subject" class="col-sm-3 col-form-label">Matematika <span class="text-danger">*</span></label>
-                                    <input type="hidden" name="subject[]['id']" value="">
-                                    <div class="col-sm-9">
-                                        <input type="number" class="form-control" id="subject" name="subject[]['score']" placeholder="Nilai">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label"></label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" name="subject[]['score']" placeholder="Keterangan"></textarea>
-                                    </div>
-                                </div> --}}
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
                                     <a href="{{ route('grade.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
-                                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                                    <button id="submit-button" type="submit" class="btn btn-primary float-right">Submit</button>
                                 </div>
                             </div>
                         </form>

@@ -25,11 +25,6 @@ class ReportSeeder extends Seeder
                         'subjects_id' => 1,
                         'value' => 80,
                         'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti pariatur et dolore laboriosam praesentium eius soluta aliquid distinctio molestiae doloremque.'
-                    ),
-                    array(
-                        'subjects_id' => 2,
-                        'value' => 90,
-                        'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti pariatur et dolore laboriosam praesentium eius soluta aliquid distinctio molestiae doloremque.'
                     )
                 )
             )

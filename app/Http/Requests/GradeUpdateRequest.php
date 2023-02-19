@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GradeRequest extends FormRequest
+class GradeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,6 @@ class GradeRequest extends FormRequest
     public function rules()
     {
         return [
-            'school_year_id' => 'required',
-            'semester' => 'required',
-            'class_room_id' => 'required',
-            'type' => 'required',
-            'student_id' => 'required',
             'subjects.*.value' => 'required',
             'subjects.*.description' => 'required'
         ];
@@ -42,13 +37,8 @@ class GradeRequest extends FormRequest
     public function attributes()
     {
         return [
-            'school_year_id' => 'tahun pelajaran',
-            'semester' => 'semester',
-            'class_room_id' => 'kelas',
-            'type' => 'jenis',
-            'student_id' => 'siswa',
             'subjects.*.value' => 'nilai',
-            'subjects.*.description' => 'nilai'
+            'subjects.*.description' => 'keterangan'
         ];
     }
 }

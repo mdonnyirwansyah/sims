@@ -146,20 +146,24 @@ class SubjectsController extends Controller
      */
     public function showByClassRoom(Request $request)
     {
-        $classRoom = ClassRoom::find($request->class_room_id);
-        $lesson_schedules = $classRoom->lesson_schedules()->with(['subjects' => function ($query) {
-            $query->orderBy('group', 'ASC')->orderBy('name', 'ASC');
-        }])->get();
+        if ($request->class_room_id === null) {
+            $data = [];
+        } else {
+            $classRoom = ClassRoom::find($request->class_room_id);
+            $lesson_schedules = $classRoom->lesson_schedules()->with(['subjects' => function ($query) {
+                $query->orderBy('group', 'ASC')->orderBy('name', 'ASC');
+            }])->get();
 
-        $data = [];
+            $data = [];
 
-        foreach ($lesson_schedules as $index => $lesson_schedule) {
-            $data[$index] = [
-                'id' => $lesson_schedule->subjects->id,
-                'name' => $lesson_schedule->subjects->name
-            ];
+            foreach ($lesson_schedules as $index => $lesson_schedule) {
+                $data[$index] = [
+                    'id' => $lesson_schedule->subjects->id,
+                    'name' => $lesson_schedule->subjects->name
+                ];
+            }
         }
-
+        
         return response()->json($data);
     }
 }

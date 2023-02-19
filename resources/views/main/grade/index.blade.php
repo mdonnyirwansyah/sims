@@ -78,6 +78,7 @@ $(document).ready(function() {
     });
 
     $('#school_year_id').change(function () {
+        $('#class_room_id').val(null).trigger('change');
         handleClassRooms();
         $('#semester').prop('disabled', false);
         $('#class_room_id').prop('disabled', false);
@@ -89,6 +90,7 @@ $(document).ready(function() {
 <script>
 function handleClassRooms() {
     $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
         theme: 'bootstrap4',
         ajax: {
             url: '{{ route('data.class-room.show-by-school-year') }}',

@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\GradeRequest;
+use App\Http\Requests\GradeStoreRequest;
+use App\Http\Requests\GradeUpdateRequest;
 use App\Models\Grade;
 use App\Models\ClassRoom;
 use App\Models\Report;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class GradeController extends Controller
@@ -79,18 +81,10 @@ class GradeController extends Controller
     public function create()
     {
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
-        $classRooms = ClassRoom::whereHas('school_year')->with(['school_year' => function ($query) {
-            $query->orderBy('name', 'DESC');
-        }])->orderBy('class', 'ASC')->orderBy('name', 'ASC')->get();
-        $students = Student::whereHas('user')->with(['user' => function ($query) {
-            $query->orderBy('name', 'ASC');
-        }])->get();
 
         $data = [
             'title' => 'Tambah Penilaian',
-            'schoolYears' => $schoolYears,
-            'classRooms' => $classRooms,
-            'students' => $students
+            'schoolYears' => $schoolYears
         ];
 
         return view('main.grade.create', compact('data'));
@@ -102,53 +96,95 @@ class GradeController extends Controller
      * @param  \App\Http\Requests\GradeRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(GradeRequest $request)
+    public function store(GradeStoreRequest $request)
     {
-        //
-    }
+        $exist = Report::where('student_id', $request->student_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->first();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Grade  $grade
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Grade $grade)
-    {
-        //
+        if ($exist) {
+            return response()->json(['exist' => 'Data sebelumnya sudah ada!']);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $reportCreated = Report::create([
+                'student_id' => $request->student_id,
+                'semester' => $request->semester,
+                'class_room_id' => $request->class_room_id,
+                'type' => $request->type
+            ]);
+
+            $reportCreated->grades()->createMany($request->subjects);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return response()->json(['failed' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => 'Data berhasil ditambah!']);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Grade  $grade
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function edit(Grade $grade)
+    public function edit(Report $report)
     {
-        //
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
+
+        $data = [
+            'title' => 'Edit Penilaian',
+            'report' => $report,
+            'schoolYears' => $schoolYears
+        ];
+
+        return view('main.grade.edit', compact('data'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Grade  $grade
+     * @param  \App\Http\Requests\GradeUpdateRequest  $request
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Grade $grade)
+    public function update(GradeUpdateRequest $request, Report $report)
     {
-        //
+        $grades = collect($request->subjects);
+        
+        try {
+            foreach ($grades as $grade) {
+                $gradeSelected = Grade::find($grade['id']);
+                $gradeSelected->update([
+                    'value' => $grade['value'],
+                    'description' => $grade['description']
+                ]);
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', $e->getMessage());
+        }
+
+        return redirect()->route('grade.index')->with('ok', 'Data berhasil diubah!');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Grade  $grade
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Grade $grade)
+    public function destroy(Report $report)
     {
-        //
+        try {
+            $report->delete();
+        } catch (\Exception $e) {
+            return response()->json(['failed' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => 'Data berhasil dihapus!']);
     }
 }

@@ -95,9 +95,9 @@ Route::middleware('auth')->group(function () {
         Route::post('get-data', 'getData')->name('getData');
         Route::get('create', 'create')->name('create');
         Route::post('', 'store')->name('store');
-        Route::get('edit/{grade}', 'edit')->name('edit');
-        Route::put('{grade}', 'update')->name('update');
-        Route::delete('{grade}', 'destroy')->name('destroy');
+        Route::get('edit/{report}', 'edit')->name('edit');
+        Route::put('{report}', 'update')->name('update');
+        Route::delete('{report}', 'destroy')->name('destroy');
     });
     Route::prefix('report')->name('report.')->group(function () {
         Route::get('', function () {
