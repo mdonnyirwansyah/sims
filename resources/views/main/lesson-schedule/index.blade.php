@@ -3,6 +3,9 @@
 @section('title', $data['title'])
 
 @push('stylesheet')
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 <!-- Sweetaler2 -->
 <link rel="stylesheet" href="{{ asset('plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
 <!-- DataTables -->
@@ -12,6 +15,8 @@
 @endpush
 
 @push('javascript')
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
 <!-- Sweetaler2 -->
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <!-- DataTables -->
@@ -20,6 +25,9 @@
 <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script>
 $(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
     $('#filter').change(function (e) {
         lessonSchedules.draw();
         e.preventDefault();
@@ -70,10 +78,43 @@ $(document).ready(function() {
             }
         ]
     });
+    $('#school_year_id').change(function () {
+        $('#class_room_id').val(null).trigger('change');
+        handleClassRooms();
+        $('#class_room_id').prop('disabled', false);
+        $('#semester').prop('disabled', false);
+    });
 });
 </script>
 
 <script>
+function handleClassRooms() {
+    $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{{ route('data.class-room.show-by-school-year') }}',
+            type: 'get',
+            data: function (params) {
+                var query = {
+                    school_year_id: $('#school_year_id').val()
+                }
+                return query;
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
+    });
+}
 function handleDelete(id) {
     let route = $(`#${id}`).attr('route');
     Swal.fire({
@@ -155,22 +196,19 @@ function handleDelete(id) {
                                     <button type="button" class="btn btn-default">Filter</button>
                                 </div>
                                 <!-- /btn-group -->
-                                <select class="form-control @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
+                                <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
                                     <option selected disabled>Pilih Tahun Pelajaran</option>
                                     @foreach ($data['schoolYears'] as $schoolYear)
                                         <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
                                     @endforeach
                                 </select>
-                                <select class="form-control @error('semester') is-invalid @enderror"  id="semester" name="semester">
+                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
+                                    <option selected disabled>Pilih Kelas</option>
+                                </select>
+                                <select class="form-control select2 @error('semester') is-invalid @enderror"  id="semester" name="semester" disabled>
                                     <option selected disabled>Pilih Semester</option>
                                     <option value="1 (satu)">1 (satu)</option>
                                     <option value="2 (dua)">2 (dua)</option>
-                                </select>
-                                <select class="form-control @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
-                                    <option selected disabled>Pilih Guru</option>
-                                    @foreach ($data['teachers'] as $teacher)
-                                        <option value="{{ $teacher->id }}">{{ $teacher->nip. ' - ' .$teacher->user->name }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                         </form>
@@ -188,8 +226,8 @@ function handleDelete(id) {
                                     <tr>
                                         <th style="width: 10px">No</th>
                                         <th>Tahun Pelajaran</th>
-                                        <th>Semester</th>
                                         <th>Kelas</th>
+                                        <th>Semester</th>
                                         <th>Guru</th>
                                         <th>Mata Pelajaran</th>
                                         <th>Hari</th>

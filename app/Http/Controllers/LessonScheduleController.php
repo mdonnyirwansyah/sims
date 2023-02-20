@@ -23,14 +23,10 @@ class LessonScheduleController extends Controller
     public function index()
     {
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
-        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
-            $query->orderBy('name', 'ASC');
-        }])->get();
 
         $data = [
             'title' => 'Jadwal Pelajaran',
-            'schoolYears' => $schoolYears,
-            'teachers' => $teachers
+            'schoolYears' => $schoolYears
         ];
 
         return view('main.lesson-schedule.index', compact('data'));
@@ -43,8 +39,8 @@ class LessonScheduleController extends Controller
      */
     public function getData(Request $request)
     {
-        if ($request->school_year_id || $request->semester || $request->teacher_id) {
-            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('teacher_id', $request->teacher_id)->orderBy('day_id', 'ASC')->get();
+        if ($request->school_year_id || $request->class_room_id || $request->semester) {
+            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->orderBy('day_id', 'ASC')->get();
         } else {
             $lessonSchedules = LessonSchedule::orderBy('day_id', 'ASC')->get();
         }

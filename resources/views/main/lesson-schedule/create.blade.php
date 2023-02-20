@@ -72,6 +72,22 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
+                                        <option selected disabled>Pilih Kelas</option>
+                                        @foreach ($data['classRooms'] as $classRoom)
+                                            <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('class_room_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <small>{{ $message }}</small>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester">
@@ -96,22 +112,6 @@ $(document).ready(function() {
                                         @endforeach
                                     </select>
                                     @error('teacher_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <small>{{ $message }}</small>
-                                    </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
-                                <div class="col-sm-9">
-                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
-                                        <option selected disabled>Pilih Kelas</option>
-                                        @foreach ($data['classRooms'] as $classRoom)
-                                            <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('class_room_id')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
                                     </span>
