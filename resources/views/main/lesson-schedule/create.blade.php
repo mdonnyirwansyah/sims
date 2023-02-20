@@ -16,7 +16,48 @@ $(document).ready(function() {
     $('.select2').select2({
       theme: 'bootstrap4'
     });
+    $('#school_year_id').change(function () {
+        $('#class_room_id').val(null).trigger('change');
+        handleClassRooms();
+        $('#class_room_id').prop('disabled', false);
+        $('#semester').prop('disabled', false);
+        $('#teacher_id').prop('disabled', false);
+        $('#subjects_id').prop('disabled', false);
+        $('#day_id').prop('disabled', false);
+        $('#start_time').prop('disabled', false);
+        $('#end_time').prop('disabled', false);
+    });
 });
+</script>
+
+<script>
+function handleClassRooms() {
+    $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
+        theme: 'bootstrap4',
+        ajax: {
+            url: '{{ route('data.class-room.show-by-school-year') }}',
+            type: 'get',
+            data: function (params) {
+                var query = {
+                    school_year_id: $('#school_year_id').val()
+                }
+                return query;
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
+    });
+}
 </script>
 @endpush
 
@@ -58,7 +99,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
+                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id" value="{{ old('school_year_id') }}">
                                         <option selected disabled>Pilih Tahun Pelajaran</option>
                                         @foreach ($data['schoolYears'] as $schoolYear)
                                             <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
@@ -74,11 +115,8 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id">
+                                    <select type="text" class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" value="{{ old('class_room_id') }}" disabled>
                                         <option selected disabled>Pilih Kelas</option>
-                                        @foreach ($data['classRooms'] as $classRoom)
-                                            <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
-                                        @endforeach
                                     </select>
                                     @error('class_room_id')
                                     <span class="invalid-feedback" role="alert">
@@ -90,7 +128,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester">
+                                    <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester" value="{{ old('semester') }}" disabled>
                                         <option selected disabled>Pilih Semester</option>
                                         <option value="1 (satu)">1 (satu)</option>
                                         <option value="2 (dua)">2 (dua)</option>
@@ -105,7 +143,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="teacher_id" class="col-sm-3 col-form-label">Guru <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
+                                    <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id" value="{{ old('teacher_id') }}" disabled>
                                         <option selected disabled>Pilih Guru</option>
                                         @foreach ($data['teachers'] as $teacher)
                                             <option value="{{ $teacher->id }}">{{ $teacher->nip. ' - ' .$teacher->user->name }}</option>
@@ -121,7 +159,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="subjects_id" class="col-sm-3 col-form-label">Mata Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('subjects_id') is-invalid @enderror" id="subjects_id" name="subjects_id">
+                                    <select class="form-control select2 @error('subjects_id') is-invalid @enderror" id="subjects_id" name="subjects_id" value="{{ old('subjects_id') }}" disabled>
                                         <option selected disabled>Pilih Mata Pelajaran</option>
                                         @foreach ($data['subjects'] as $subjects)
                                             <option value="{{ $subjects->id }}">{{ $subjects->name }}</option>
@@ -137,7 +175,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="day_id" class="col-sm-3 col-form-label">Hari <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('day_id') is-invalid @enderror" id="day_id" name="day_id">
+                                    <select class="form-control select2 @error('day_id') is-invalid @enderror" id="day_id" name="day_id" value="{{ old('day_id') }}" disabled>
                                         <option selected disabled>Pilih Hari</option>
                                         @foreach ($data['days'] as $day)
                                             <option value="{{ $day->id }}">{{ $day->name }}</option>
@@ -153,7 +191,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="start_time" class="col-sm-3 col-form-label">Jam Mulai <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="time" class="form-control @error('start_time') is-invalid @enderror" id="start_time" name="start_time" value="{{ old('start_time') }}">
+                                    <input type="time" class="form-control @error('start_time') is-invalid @enderror" id="start_time" name="start_time" value="{{ old('start_time') }}" disabled>
                                     @error('start_time')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>
@@ -164,7 +202,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="end_time" class="col-sm-3 col-form-label">Jam Selesai <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <input type="time" class="form-control @error('end_time') is-invalid @enderror" id="end_time" name="end_time" value="{{ old('end_time') }}">
+                                    <input type="time" class="form-control @error('end_time') is-invalid @enderror" id="end_time" name="end_time" value="{{ old('end_time') }}" disabled>
                                     @error('end_time')
                                     <span class="invalid-feedback" role="alert">
                                         <small>{{ $message }}</small>

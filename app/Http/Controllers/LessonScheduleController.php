@@ -90,7 +90,6 @@ class LessonScheduleController extends Controller
         $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
-        $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
         $days = Day::orderBy('id', 'ASC')->get();
         
@@ -98,7 +97,6 @@ class LessonScheduleController extends Controller
             'title' => 'Tambah Jadwal Pelajaran',
             'schoolYears' => $schoolYears,
             'teachers' => $teachers,
-            'classRooms' => $classRooms,
             'subjects' => $subjects,
             'days' => $days
         ];
