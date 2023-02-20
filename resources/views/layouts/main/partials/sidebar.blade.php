@@ -10,7 +10,7 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="{!! Auth::user()->user_detail->profile_picture ? asset('storage/profile-pictures/'.  Auth::user()->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" class="img-circle elevation-2" alt="User profile picture">
+                <img @if (Auth::user()->user_detail()->count() > 0) src="{!! Auth::user()->user_detail->profile_picture ? asset('storage/profile-pictures/'.  Auth::user()->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" @else src="{{ asset('dist/img/profile-picture.png') }}" @endif  class="img-circle elevation-2" alt="User profile picture">
             </div>
             <div class="info">
                 <a href="{{ route('profile.index') }}" class="d-block">{{ Auth::user()->name }}</a>
