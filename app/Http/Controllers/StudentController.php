@@ -46,7 +46,7 @@ class StudentController extends Controller
                 'nis_nisn' => $student->nis .' / '. $student->nisn,
                 'name' => $student->user->name,
                 'class_now' => $student->class_now,
-                'phone' => $student->user->address->phone
+                'phone' => $student->user->address()->count() > 0 ? $student->user->address->phone : '-'
             ];
         }
 

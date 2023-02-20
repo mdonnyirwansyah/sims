@@ -46,7 +46,7 @@ class TeacherController extends Controller
                 'nip' => $teacher->nip,
                 'name' => $teacher->user->name,
                 'education' => $teacher->education,
-                'phone' => $teacher->user->address->phone
+                'phone' => $teacher->user->address()->count() > 0 ? $teacher->user->address->phone : '-'
             ];
         }
 
