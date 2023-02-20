@@ -1,13 +1,27 @@
 @extends('layouts.main.index')
 
-@section('title', 'Profil')
+@section('title', $data['title'])
+
+@push('stylesheet')
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+@endpush
 
 @push('javascript')
-@if(session()->has('status'))
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
 <script>
-  toastr.success("{{ __('Successfully saved!') }}", 'Notification,');
+$(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
+    @if ($data['user']->user_detail()->count() > 0) 
+        $('#gender').val("{{ $data['user']->user_detail->gender }}").change();
+        $('#religion').val("{{ $data['user']->user_detail->religion }}").change();
+    @endif
+});
 </script>
-@endif
 @endpush
 
 @section('content')
@@ -21,7 +35,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item active">Profil</li>
+                    <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
         </div>
@@ -38,14 +52,12 @@
                 <div class="card card-primary card-outline">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            <img class="profile-user-img img-fluid img-circle"
-                                src="{!! $user->user_detail->profile_picture ? asset('storage/profile-pictures/'. $user->student->user->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}"
-                                alt="User profile picture">
+                            <img class="profile-user-img img-fluid img-circle" @if ($data['user']->user_detail()->count() > 0) src="{!! $data['user']->user_detail->profile_picture ? asset('storage/profile-pictures/'.  $data['user']->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" @else src="{{ asset('dist/img/profile-picture.png') }}" @endif alt="User profile picture">
                         </div>
 
-                        <h3 class="profile-username text-center">{{ $user->name }}</h3>
+                        <h3 class="profile-username text-center">{{ $data['user']->name }}</h3>
 
-                        <p class="text-muted text-center">{{ $user->teacher->nip }}</p>
+                        <p class="text-muted text-center">{{ $data['user']->teacher->nip }}</p>
 
                         <a class="btn btn-danger btn-block" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <i class="fas fa-sign-out-alt"></i>
@@ -77,7 +89,7 @@
                                     <div class="form-group row">
                                         <label for="name" class="col-sm-3 col-form-label">Nama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $user->name }}">
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') ?? $data['user']->name ?? '' }}">
                                             @error('name')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -88,7 +100,7 @@
                                     <div class="form-group row">
                                         <label for="nip" class="col-sm-3 col-form-label">NIP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip" name="nip" value="{{ old('nip') ?? $user->teacher->nip }}">
+                                            <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip" name="nip" value="{{ old('nip') ?? $data['user']->teacher->nip ?? '' }}">
                                             @error('nip')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -99,7 +111,7 @@
                                     <div class="form-group row">
                                         <label for="place_of_birth" class="col-sm-3 col-form-label">Tempat Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') ?? $user->user_detail->place_of_birth }}">
+                                            <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') ?? $data['user']->user_detail->place_of_birth ?? '' }}">
                                             @error('place_of_birth')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -110,7 +122,7 @@
                                     <div class="form-group row">
                                         <label for="date_of_birth" class="col-sm-3 col-form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') ?? $user->user_detail->date_of_birth }}">
+                                            <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') ?? $data['user']->user_detail->date_of_birth ?? '' }}">
                                             @error('date_of_birth')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -121,8 +133,8 @@
                                     <div class="form-group row">
                                         <label for="gender" class="col-sm-3 col-form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" value="{{ $user->user_detail->gender }}">
-                                                <option disabled>Pilih Jenis Kelamin</option>
+                                            <select class="form-control select2 @error('gender') is-invalid @enderror" id="gender" name="gender" value="{{ $data['user']->user_detail->gender ?? '' }}">
+                                                <option selected disabled>Pilih Jenis Kelamin</option>
                                                 <option value="Male">Laki-laki</option>
                                                 <option value="Female">Perempuan</option>
                                             </select>
@@ -136,8 +148,8 @@
                                     <div class="form-group row">
                                         <label for="religion" class="col-sm-3 col-form-label">Agama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control @error('religion') is-invalid @enderror" id="religion" name="religion" value="{{ old('religion') ?? $user->user_detail->gender }}">
-                                                <option disabled>Pilih Agama</option>
+                                            <select class="form-control select2 @error('religion') is-invalid @enderror" id="religion" name="religion" value="{{ old('religion') ?? $data['user']->user_detail->gender ?? '' }}">
+                                                <option selected disabled>Pilih Agama</option>
                                                 <option value="Islam">Islam</option>
                                                 <option value="Kristen">Kristen</option>
                                                 <option value="Hindu">Hindu</option>
@@ -154,7 +166,7 @@
                                     <div class="form-group row">
                                         <label for="education" class="col-sm-3 col-form-label">Pendidikan <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('education') is-invalid @enderror" id="education" name="education" value="{{ old('education') ?? $user->teacher->education }}">
+                                            <input type="text" class="form-control @error('education') is-invalid @enderror" id="education" name="education" value="{{ old('education') ?? $data['user']->teacher->education ?? '' }}">
                                             @error('education')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -186,7 +198,7 @@
                                     <div class="form-group row">
                                         <label for="address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $user->address->address }}</textarea>
+                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $data['user']->address->address ?? '' }}</textarea>
                                             @error('address')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -197,7 +209,7 @@
                                     <div class="form-group row">
                                         <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $user->address->email }}">
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $data['user']->address->email ?? '' }}">
                                             @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -208,7 +220,7 @@
                                     <div class="form-group row">
                                         <label for="phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $user->address->phone }}">
+                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $data['user']->address->phone ?? '' }}">
                                             @error('phone')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>

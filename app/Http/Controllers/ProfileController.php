@@ -15,12 +15,17 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
+        $data = [
+            'title' => 'Profil',
+            'user' => $user
+        ];
 
         if($user->role->name === 'Student') {
-            return view('main.profile.student.index', compact('user'));
+            return view('main.profile.student.index', compact('data'));
         }
         
-        return view('main.profile.mix.index', compact('user'));
+        return view('main.profile.mix.index', compact('data'));
     }
 
     /**
