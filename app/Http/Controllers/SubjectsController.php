@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SubjectsStoreRequest;
-use App\Http\Requests\SubjectsUpdateRequest;
+use App\Http\Requests\SubjectsRequest;
 use App\Models\ClassRoom;
 use App\Models\Subjects;
 use Illuminate\Http\Request;
@@ -67,11 +66,17 @@ class SubjectsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\SubjectsStoreRequest  $request
+     * @param  \App\Http\Requests\SubjectsRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SubjectsStoreRequest $request)
+    public function store(SubjectsRequest $request)
     {
+        $exist = Subjects::where('group', $request->group)->where('name', $request->name)->first();
+
+        if ($exist) {
+            return redirect()->back()->with('exist', 'Data sebelumnya sudah ada!');
+        }
+
         try {
             Subjects::create([
                 'name' => $request->name,
@@ -103,12 +108,18 @@ class SubjectsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\SubjectsUpdateRequest  $request
+     * @param  \App\Http\Requests\SubjectsRequest  $request
      * @param  \App\Models\Subjects  $subjects
      * @return \Illuminate\Http\Response
      */
-    public function update(SubjectsUpdateRequest $request, Subjects $subjects)
+    public function update(SubjectsRequest $request, Subjects $subjects)
     {
+        $exist = Subjects::whereNotIn('id', [$subjects->id])->where('group', $request->group)->where('name', $request->name)->first();
+
+        if ($exist) {
+            return redirect()->back()->with('exist', 'Data sebelumnya sudah ada!');
+        }
+
         try {
             $subjects->update([
                 'name' => $request->name,
