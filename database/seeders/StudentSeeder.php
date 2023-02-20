@@ -19,7 +19,7 @@ class StudentSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        for ($i=0; $i < 100; $i++) { 
+        for ($i=0; $i < 40; $i++) { 
             $nis = $faker->randomNumber(5, true);
             $nisn = $faker->randomNumber(8, true);
 

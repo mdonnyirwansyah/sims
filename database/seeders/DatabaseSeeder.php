@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             SubjectsSeeder::class,
             ClassRoomSeeder::class,
             DaySeeder::class,
-            // LessonScheduleSeeder::class,
+            LessonScheduleSeeder::class,
             // ReportSeeder::class
         ]);
     }
