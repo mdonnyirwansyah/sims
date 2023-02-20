@@ -48,8 +48,8 @@ $(document).ready(function() {
             type: 'post',
             data: function (d) {
                 d.school_year_id = $('#school_year_id').val();
-                d.semester = $('#semester').val();
                 d.class_room_id = $('#class_room_id').val();
+                d.semester = $('#semester').val();
                 d.type = $('#type').val();
             },
             headers: {
@@ -63,8 +63,8 @@ $(document).ready(function() {
                 orderable: false,
                 searchable: false
             },
-            {data: 'semester', name: 'semester'},
             {data: 'class_room', name: 'class_room'},
+            {data: 'semester', name: 'semester'},
             {data: 'student', name: 'student'},
             {data: 'type', name: 'type'},
             {
@@ -80,8 +80,8 @@ $(document).ready(function() {
     $('#school_year_id').change(function () {
         $('#class_room_id').val(null).trigger('change');
         handleClassRooms();
-        $('#semester').prop('disabled', false);
         $('#class_room_id').prop('disabled', false);
+        $('#semester').prop('disabled', false);
         $('#type').prop('disabled', false);
     });
 });
@@ -202,13 +202,13 @@ function handleDelete(id) {
                                         <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
                                     @endforeach
                                 </select>
+                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
+                                    <option selected disabled>Pilih Kelas</option>
+                                </select>
                                 <select class="form-control select2 @error('semester') is-invalid @enderror"  id="semester" name="semester" disabled>
                                     <option selected disabled>Pilih Semester</option>
                                     <option value="1 (satu)">1 (satu)</option>
                                     <option value="2 (dua)">2 (dua)</option>
-                                </select>
-                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
-                                    <option selected disabled>Pilih Kelas</option>
                                 </select>
                                 <select class="form-control select2 @error('type') is-invalid @enderror"  id="type" name="type" disabled>
                                     <option selected disabled>Pilih Jenis</option>
@@ -230,8 +230,8 @@ function handleDelete(id) {
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">No</th>
-                                        <th>Semester</th>
                                         <th>Kelas</th>
+                                        <th>Semester</th>
                                         <th>Siswa</th>
                                         <th>Jenis</th>
                                         <th>Aksi</th>
