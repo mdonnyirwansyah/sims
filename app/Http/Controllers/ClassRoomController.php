@@ -98,6 +98,13 @@ class ClassRoomController extends Controller
      */
     public function store(ClassRoomRequest $request)
     {
+        $existName = ClassRoom::where('school_year_id', $request->school_year_id)->where('name', $request->name)->first();
+        $existTeacher = ClassRoom::where('school_year_id', $request->school_year_id)->where('teacher_id', $request->teacher_id)->first();
+
+        if ($existName || $existTeacher) {
+            return redirect()->back()->with('exist', 'Data sebelumnya sudah ada!');
+        }
+
         try {
             ClassRoom::create([
                 'school_year_id' => $request->school_year_id,
@@ -189,6 +196,13 @@ class ClassRoomController extends Controller
      */
     public function update(ClassRoomRequest $request, ClassRoom $classRoom)
     {
+        $existName = ClassRoom::whereNotIn('id', [$classRoom->id])->where('school_year_id', $request->school_year_id)->where('name', $request->name)->first();
+        $existTeacher = ClassRoom::whereNotIn('id', [$classRoom->id])->where('school_year_id', $request->school_year_id)->where('teacher_id', $request->teacher_id)->first();
+
+        if ($existName || $existTeacher) {
+            return redirect()->back()->with('exist', 'Data sebelumnya sudah ada!');
+        }
+        
         try {
             $classRoom->update([
                 'school_year_id' => $request->school_year_id,

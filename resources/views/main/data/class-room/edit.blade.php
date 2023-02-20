@@ -21,6 +21,12 @@ $(document).ready(function() {
     $('#teacher_id').val("{{ $data['classRoom']->teacher_id }}").change();
 });
 </script>
+
+@if($message = Session::get('exist'))
+<script>
+  toastr.error('{{ $message }}', 'Pemberitahuan,');
+</script>
+@endif
 @endpush
 
 @section('content')
