@@ -15,8 +15,7 @@ class SchoolYearSeeder extends Seeder
     public function run()
     {
         $schoolYears = collect([
-            '2022/2023',
-            '2023/2024'
+            '2022/2023'
         ]);
 
         $schoolYears->each(function ($schoolYear) {

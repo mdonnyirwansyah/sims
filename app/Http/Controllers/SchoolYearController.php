@@ -35,6 +35,9 @@ class SchoolYearController extends Controller
 
         return DataTables::of($schoolYears)
         ->addIndexColumn()
+        ->editColumn('status', function ($schoolYear) {
+            return $schoolYear->status === '1' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Non Aktif</span>';
+        })
         ->addColumn('action', function ($schoolYears) {
             return '
             <a href="'. route("data.school-year.edit", $schoolYears['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
@@ -45,7 +48,7 @@ class SchoolYearController extends Controller
             </button>
             ';
         })
-        ->rawColumns(['action'])
+        ->rawColumns(['action', 'status'])
         ->make(true);
     }
 
@@ -71,9 +74,24 @@ class SchoolYearController extends Controller
      */
     public function store(SchoolYearStoreRequest $request)
     {
+        $isActiveSchoolYears = SchoolYear::where('status', '1')->get();
+        
+        if (!$request->status && $isActiveSchoolYears->count() === 0) {
+            return redirect()->back()->with('failed', 'Harus ada tahun pelajaran yang aktif!');
+        }
+
         try {
+            if ($request->status) {
+                foreach ($isActiveSchoolYears as $isActiveSchoolYear) {
+                    $isActiveSchoolYear->update([
+                        'status' => 0
+                    ]);
+                }
+            }
+
             SchoolYear::create([
-                'name' => $request->name
+                'name' => $request->name,
+                'status' => $request->status ?? 0
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('failed', $e->getMessage());
@@ -107,9 +125,24 @@ class SchoolYearController extends Controller
      */
     public function update(SchoolYearUpdateRequest $request, SchoolYear $schoolYear)
     {
+        $isActiveSchoolYears = SchoolYear::whereNotIn('id', [$schoolYear->id])->where('status', '1')->get();
+        
+        if (!$request->status && $isActiveSchoolYears->count() === 0) {
+            return redirect()->back()->with('failed', 'Harus ada tahun pelajaran yang aktif!');
+        }
+
         try {
+            if ($request->status) {
+                foreach ($isActiveSchoolYears as $isActiveSchoolYear) {
+                    $isActiveSchoolYear->update([
+                        'status' => 0
+                    ]);
+                }
+            }
+
             $schoolYear->update([
-                'name' => $request->name
+                'name' => $request->name,
+                'status' => $request->status ?? 0
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('failed', $e->getMessage());

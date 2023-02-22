@@ -16,6 +16,7 @@ class CreateSchoolYearsTable extends Migration
         Schema::create('school_years', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->enum('status', [0, 1])->default(1);
             $table->timestamps();
         });
     }

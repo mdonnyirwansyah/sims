@@ -22,6 +22,38 @@
     <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
+            <div class="col-12">
+                <div class="card direct-chat direct-chat-primary collapsed-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Filter</h3>
+        
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-3">
+                        <form method="get" >
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                                <!-- /btn-group -->
+                                <select class="form-control @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
+                                    <option selected disabled>Pilih Tahun Pelajaran</option>
+                                    @foreach ($data['schoolYears'] as $schoolYear)
+                                        <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!--/.direct-chat -->
+            </div>
             <div class="col-lg-3 col-6">
               <!-- small box -->
                 <div class="small-box bg-info">

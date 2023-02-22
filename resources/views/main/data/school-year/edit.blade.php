@@ -2,6 +2,16 @@
 
 @section('title', $data['title'])
 
+@push('javascript')
+<!-- Bootstrap Switch -->
+<script src="{{ asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
+<script>
+$("input[data-bootstrap-switch]").each(function(){
+    $(this).bootstrapSwitch('state', $(this).prop('checked'));
+})
+</script>
+@endpush
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -47,6 +57,12 @@
                                         <small>{{ $message }}</small>
                                     </span>
                                     @enderror
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="status" class="col-sm-3 col-form-label">Status</label>
+                                <div class="col-sm-9">
+                                    <input type="checkbox" @if ($data['schoolYear']->status === '1') checked @endif data-bootstrap-switch data-size="large" data-off-text="Non Aktif" data-off-color="danger" data-on-text="Aktif" data-on-color="success" class="form-control" id="status" name="status" value="1">
                                 </div>
                             </div>
                             <div class="form-group row">

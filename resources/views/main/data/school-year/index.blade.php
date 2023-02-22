@@ -44,6 +44,11 @@ $(document).ready(function() {
             },
             {data: 'name', name: 'name'},
             {
+                data: 'status',
+                name: 'status',
+                orderable: false
+            },
+            {
                 data: 'action',
                 name: 'action',
                 width: 75,
@@ -142,6 +147,7 @@ function handleDelete(id) {
                                     <tr>
                                         <th style="width: 10px">No</th>
                                         <th>Tahun Pelajaran</th>
+                                        <th>Status</th>
                                         <th style="width: 40px">Aksi</th>
                                     </tr>
                                 </thead>

@@ -1,6 +1,6 @@
 @extends('layouts.main.index')
 
-@section('title', 'Beranda')
+@section('title', $data['title'])
 
 @section('content')
 <!-- Content Header (Page header) -->
@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Beranda</h1>
+                <h1 class="m-0">{{ $data['title'] }}</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -28,10 +28,11 @@
             </div>
             <div class="card-body">
                 <div class="row">
+                    @forelse ($data['lessonSchedules'] as $lessonSchedule)
                     <div class="col-md-4">
                         <div class="card card-light card-outline">
                             <div class="card-header d-flex justify-content-center">
-                                <h3 class="card-title font-weight-bold">Senin</h3>
+                                <h3 class="card-title font-weight-bold">{{ $lessonSchedule['day'] }}</h3>
                             </div>
                             <div class="card-body p-0">
                                 <table class="table">
@@ -42,15 +43,22 @@
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      <tr>
-                                        <td>Matematika</td>
-                                        <td>08.00 - 10.00</td>
-                                      </tr>
+                                        @foreach ($lessonSchedule['schedules'] as $schedule)
+                                        <tr>
+                                            <td>{{ $schedule['subjects'] }}</td>
+                                            <td>{{ $schedule['time'] }}</td>
+                                          </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+                    @empty
+                    <div class="col-md-12">
+                        <p class="text-center">Jadwal Pelajaran Tidak Ditemukan!</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

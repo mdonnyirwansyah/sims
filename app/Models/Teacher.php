@@ -20,4 +20,12 @@ class Teacher extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the lesson schedules for the student.
+     */
+    public function lesson_schedules()
+    {
+        return $this->hasMany(LessonSchedule::class);
+    }
 }
