@@ -84,14 +84,14 @@ class SchoolYearController extends Controller
             if ($request->status) {
                 foreach ($isActiveSchoolYears as $isActiveSchoolYear) {
                     $isActiveSchoolYear->update([
-                        'status' => 0
+                        'status' => '0'
                     ]);
                 }
             }
 
             SchoolYear::create([
                 'name' => $request->name,
-                'status' => $request->status ?? 0
+                'status' => $request->status ?? '0'
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('failed', $e->getMessage());
@@ -135,14 +135,14 @@ class SchoolYearController extends Controller
             if ($request->status) {
                 foreach ($isActiveSchoolYears as $isActiveSchoolYear) {
                     $isActiveSchoolYear->update([
-                        'status' => 0
+                        'status' => '0'
                     ]);
                 }
             }
 
             $schoolYear->update([
                 'name' => $request->name,
-                'status' => $request->status ?? 0
+                'status' => $request->status ?? '0'
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('failed', $e->getMessage());

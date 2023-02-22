@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReportFilterRequest;
 use App\Models\Report;
 use App\Models\SchoolYear;
 use App\Models\Student;
@@ -19,16 +20,24 @@ class ReportController extends Controller
     public function index()
     {
         $user = Auth::user();
+
+        if($user->role->name === 'Student') {
+            $classRooms = $user->student->class_rooms()->orderBy('class', 'DESC')->get();
+    
+            $data = [
+                'title' => 'E-Raport',
+                'classRooms' => $classRooms
+            ];
+
+            return view('main.report.student.index', compact('data'));
+        }
+
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
 
         $data = [
             'title' => 'E-Raport',
             'schoolYears' => $schoolYears
         ];
-
-        if($user->role->name === 'Student') {
-            return view('main.report.student.index', compact('data'));
-        }
         
         return view('main.report.mix.index', compact('data'));
     }
@@ -98,5 +107,33 @@ class ReportController extends Controller
         ];
         
         return view('main.report.mix.show', compact('data'));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Http\Requests\ReportFilterRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showByFilter(ReportFilterRequest $request)
+    {
+        $user = Auth::user();
+        $classRoom = $user->student->class_rooms()->where('class_room_id', $request->class_room_id)->first();
+        $report = $classRoom->reports()->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->latest()->first();
+        $studentData = [
+            'name' => $user->name,
+            'nis_nisn' => $user->student->nis. ' / ' .$user->student->nisn,
+            'class_room' => $classRoom->name,
+            'semester' => $report->semester ?? '-',
+            'school_year' => $report->class_room->school_year->name ?? '-'
+        ];
+        $reports = $user->student->reports()->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->get();
+        $data = [
+            'title' => 'Lihat E-Raport',
+            'studentData' => $studentData,
+            'reports' => $reports
+        ];
+        
+        return view('main.report.student.show', compact('data'));
     }
 }

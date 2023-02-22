@@ -25,7 +25,7 @@ class BerandaController extends Controller
 
         if ($user->role->name === 'Administrator') {
             $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
-            $teachers = Teacher::all()->count();
+            $teachers = Teacher::whereRelation('user', 'role_id', 2)->get()->count();
             $students = Student::all()->count();
             $subjects = Subjects::all()->count();
             if ($request->school_year_id) {

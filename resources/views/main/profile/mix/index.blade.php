@@ -240,19 +240,19 @@ $(document).ready(function() {
                             <div class="tab-pane" id="account">
                                 <form class="form-horizontal">
                                     <div class="form-group row">
-                                        <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang</label>
+                                        <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="current_password" name="current_password">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="new_password" class="col-sm-3 col-form-label">Password Baru</label>
+                                        <label for="new_password" class="col-sm-3 col-form-label">Password Baru <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="new_password" name="new_password">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password</label>
+                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="confirm_password" name="confirm_password">
                                         </div>

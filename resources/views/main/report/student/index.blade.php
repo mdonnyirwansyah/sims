@@ -3,28 +3,36 @@
 @section('title', 'E-Raport')
 
 @push('stylesheet')
-    <style>
-        #table {
-            font-size: 10px;
-        }
-        #table td, #table th {
-            border: 1px solid black;
-            padding: 8px;
-        }
-        #list {
-            padding-left: 1rem;
-            font-weight: bold;
-            font-size: 12px;
-        }
-    </style>
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<!-- Table -->
+<style>
+    #table {
+        font-size: 10px;
+    }
+    #table td, #table th {
+        border: 1px solid black;
+        padding: 8px;
+    }
+    #list {
+        padding-left: 1rem;
+        font-weight: bold;
+        font-size: 12px;
+    }
+</style>
 @endpush
 
 @push('javascript')
-@if(session()->has('status'))
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
 <script>
-  toastr.success("{{ __('Successfully saved!') }}", 'Notification,');
+$(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
+});
 </script>
-@endif
 @endpush
 
 @section('content')
@@ -52,17 +60,19 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <form action="{{ route('report.result') }}" method="get">
-                            <div class="input-group mb-3">
+                        <form action="{{ route('report.show-by-filter') }}" method="get">
+                            <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-primary">Pilih</button>
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
                                 </div>
                                 <!-- /btn-group -->
-                                <select class="form-control @error('class') is-invalid @enderror" name="class">
+                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" name="class_room_id">
                                     <option selected disabled>Pilih Kelas</option>
-                                    <option value="1|XI IPS 1">XI IPS 1</option>
+                                    @foreach ($data['classRooms'] as $classRoom)
+                                        <option value="{{ $classRoom->id }}">{{ $classRoom->name }}</option>
+                                    @endforeach
                                 </select>
-                                <select class="form-control @error('semester') is-invalid @enderror" name="semester">
+                                <select class="form-control select2 @error('semester') is-invalid @enderror" name="semester">
                                     <option selected disabled>Pilih Semester</option>
                                     <option value="1 (satu)">1 (satu)</option>
                                     <option value="2 (dua)">2 (dua)</option>

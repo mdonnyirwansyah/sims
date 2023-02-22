@@ -191,9 +191,9 @@ function handleDelete(id) {
                 <div class="card">
                     <div class="card-header">
                         <form id="filter">
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <button type="button" class="btn btn-default">Filter</button>
+                                    <span class="input-group-text">Filter</span>
                                 </div>
                                 <!-- /btn-group -->
                                 <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">

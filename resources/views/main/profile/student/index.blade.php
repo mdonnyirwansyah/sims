@@ -194,19 +194,25 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
+                                        <label for="class" class="col-sm-3 col-form-label">Kelas</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="class" name="class" value="<?php $class = $data['user']->student->class_rooms()->latest()->first(); $class ? print $class->name : print '-' ?>" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <div class="col-sm-12 col-form-label pb-0">
                                             <h2 class="card-title font-weight-bold text-muted">Diterima di sekolah ini</h2>
                                         </div>
                                     </div>
                                     <hr>
                                     <div class="form-group row">
-                                        <label for="class_at" class="col-sm-3 col-form-label">Di Kelas <span class="text-danger">*</span></label>
+                                        <label for="class_at" class="col-sm-3 col-form-label">Di Kelas</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="class_at" name="class_at" value="{{ $data['user']->student->class_at ?? '' }}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="registered_at" class="col-sm-3 col-form-label">Pada Tanggal <span class="text-danger">*</span></label>
+                                        <label for="registered_at" class="col-sm-3 col-form-label">Pada Tanggal</label>
                                         <div class="col-sm-9">
                                             <input type="date" class="form-control" id="registered_at" name="registered_at" value="{{ $data['user']->student->registered_at ?? '' }}" readonly>
                                         </div>
@@ -419,19 +425,19 @@ $(document).ready(function() {
                             <div class="tab-pane" id="account">
                                 <form class="form-horizontal">
                                     <div class="form-group row">
-                                        <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang</label>
+                                        <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="current_password" name="current_password">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="new_password" class="col-sm-3 col-form-label">Password Baru</label>
+                                        <label for="new_password" class="col-sm-3 col-form-label">Password Baru <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="new_password" name="new_password">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password</label>
+                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" id="confirm_password" name="confirm_password">
                                         </div>

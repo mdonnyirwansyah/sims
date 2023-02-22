@@ -44,4 +44,12 @@ class ClassRoom extends Model
     {
         return $this->hasMany(LessonSchedule::class);
     }
+
+    /**
+     * Get the reports for the class room.
+     */
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }

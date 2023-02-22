@@ -87,7 +87,7 @@ class LessonScheduleController extends Controller
     public function create()
     {
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
-        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
+        $teachers = Teacher::whereRelation('user', 'role_id', 2)->whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
@@ -139,7 +139,7 @@ class LessonScheduleController extends Controller
     public function edit(LessonSchedule $lessonSchedule)
     {
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
-        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
+        $teachers = Teacher::whereRelation('user', 'role_id', 2)->whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
         $classRooms = ClassRoom::orderBy('name', 'DESC')->get();

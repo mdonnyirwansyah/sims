@@ -35,7 +35,7 @@ class TeacherController extends Controller
      */
     public function getData()
     {
-        $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
+        $teachers = Teacher::whereRelation('user', 'role_id', 2)->whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
         $data = [];
