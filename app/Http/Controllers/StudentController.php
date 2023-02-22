@@ -38,20 +38,28 @@ class StudentController extends Controller
     public function getData()
     {
         $students = Student::orderBy('registered_at', 'DESC')->get();
-        $data = [];
 
-        foreach ($students as $index => $student) {
-            $data[$index] = [
-                'id' => $student->id,
-                'nis_nisn' => $student->nis .' / '. $student->nisn,
-                'name' => $student->user->name,
-                'class_now' => $student->class_now,
-                'phone' => $student->user->address()->count() > 0 ? $student->user->address->phone : '-'
-            ];
-        }
-
-        return DataTables::of($data)
+        return DataTables::of($students)
         ->addIndexColumn()
+        ->editColumn('nis_nisn', function($student) {
+            return $student->nis .' / '. $student->nisn;
+        })
+        ->editColumn('name', function($student) {
+            return $student->user->name;
+        })
+        ->editColumn('class_room', function($student) {
+            if ($student->class_rooms()->count() > 0) {
+                $classRoom = $student->class_rooms()->latest()->first();
+                $studentClassRoom = $classRoom->name;
+            } else {
+                $studentClassRoom = '-';
+            }
+
+            return $studentClassRoom;
+        })
+        ->editColumn('phone', function($student) {
+            return $student->user->address()->count() > 0 ? $student->user->address->phone : '-';
+        })
         ->addColumn('action', function ($data) {
             return '
             <a href="'. route("data.student.edit", $data['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
@@ -111,7 +119,6 @@ class StudentController extends Controller
             $studentCreated = $userCreated->student()->create([
                 'nis' => $request->nis,
                 'nisn' => $request->nisn,
-                'class_now' => $request->class_at,
                 'class_at' => $request->class_at,
                 'registered_at' => $request->registered_at
             ]);

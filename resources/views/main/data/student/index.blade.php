@@ -44,7 +44,7 @@ $(document).ready(function() {
             },
             {data: 'nis_nisn', name: 'nis_nisn'},
             {data: 'name', name: 'name'},
-            {data: 'class_now', name: 'class_now'},
+            {data: 'class_room', name: 'class_room'},
             {data: 'phone', name: 'phone'},
             {
                 data: 'action',

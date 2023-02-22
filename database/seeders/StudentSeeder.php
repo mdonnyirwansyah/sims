@@ -32,7 +32,6 @@ class StudentSeeder extends Seeder
             $userCreated->student()->create([
                 "nis" => $nis,
                 "nisn" => $nisn,
-                "class_now" => "X",
                 "class_at" => "X",
                 "registered_at" => "2020/06/05"
             ]);

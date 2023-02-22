@@ -18,7 +18,6 @@ class CreateStudentsTable extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('nis')->unique();
             $table->string('nisn')->unique();
-            $table->string('class_now');
             $table->string('class_at');
             $table->date('registered_at');
             $table->timestamps();
