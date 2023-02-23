@@ -34,6 +34,7 @@
                         <p>Profil</p>
                     </a>
                 </li>
+                @can('is-administrator', Auth::user())
                 <li class="nav-item {{ request()->routeIs('data.*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->routeIs('data.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-archive"></i>
@@ -81,12 +82,15 @@
                         <p>Jadwal Pelajaran</p>
                     </a>
                 </li>
+                @endcan
+                @can('is-administrator-or-teacher', Auth::user())
                 <li class="nav-item">
                     <a href="{{ route('grade.index') }}" class="nav-link {{ request()->routeIs('grade.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-check-square"></i>
                         <p>Penilaian</p>
                     </a>
                 </li>
+                @endcan
                 <li class="nav-item">
                     <a href="{{ route('report.index') }}" class="nav-link {{ request()->routeIs('report.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file"></i>

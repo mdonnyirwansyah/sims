@@ -82,4 +82,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Teacher::class);
     }
+
+    /**
+     * Check if the user has a role
+     * @param array $role
+     * @return bool
+     */
+    public function hasAnyRole(array $role)
+    {
+        return null !== $this->role()->whereIn('name', $role)->first();
+    }
 }
