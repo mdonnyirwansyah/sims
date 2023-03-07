@@ -12,4 +12,12 @@ class UserDetail extends Model
     protected $table = 'user_details';
 
     protected $guarded = [];
+    
+    /**
+    * Get the user that owns the user detail    .
+    */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

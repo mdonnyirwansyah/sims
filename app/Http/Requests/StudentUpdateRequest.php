@@ -36,13 +36,13 @@ class StudentUpdateRequest extends FormRequest
                 'class_at' => 'required',
                 'registered_at' => 'required',
                 'address' => 'required',
-                'email' => 'required|unique:addresses,email,'.$this->student->user->address->id,
-                'phone' => 'required|unique:addresses,phone,'.$this->student->user->address->id,
+                'email' => $this->student->user->address()->count() > 0 ? 'required|unique:addresses,email,'.$this->student->user->address->id : 'required|unique:addresses,email',
+                'phone' => $this->student->user->address()->count() > 0 ? 'required|unique:addresses,phone,'.$this->student->user->address->id : 'required|unique:addresses,phone',
                 'father.*' => 'required',
-                'father.phone' => 'required|unique:addresses,phone,'.$this->student->families[0]->address->id,
+                'father.phone' => $this->student->families[0]->address()->count() > 0 ? 'required|unique:addresses,phone,'.$this->student->families[0]->address->id : 'required|unique:addresses,phone',
                 'mother.*' => 'required',
                 'guardian.*' => 'required',
-                'guardian.phone' => 'unique:addresses,phone,'.$this->student->families[2]->address->id
+                'guardian.phone' => $this->student->families[2]->address()->count() > 0 ? 'unique:addresses,phone,'.$this->student->families[2]->address->id : 'unique:addresses,phone'
             ];
         }
 
@@ -58,10 +58,10 @@ class StudentUpdateRequest extends FormRequest
             'class_at' => 'required',
             'registered_at' => 'required',
             'address' => 'required',
-            'email' => 'required|unique:addresses,email,'.$this->student->user->address->id,
-            'phone' => 'required|unique:addresses,phone,'.$this->student->user->address->id,
+            'email' => $this->student->user->address()->count() > 0 ? 'required|unique:addresses,email,'.$this->student->user->address->id : 'required|unique:addresses,email',
+            'phone' => $this->student->user->address()->count() > 0 ? 'required|unique:addresses,phone,'.$this->student->user->address->id : 'required|unique:addresses,phone',
             'father.*' => 'required',
-            'father.phone' => 'unique:addresses,phone,'.$this->student->families[0]->address->id,
+            'father.phone' => $this->student->families()->count() > 0 ? 'required|unique:addresses,phone,'.$this->student->families[0]->address->id : 'required|unique:addresses,phone',
             'mother.*' => 'required',
             'guardian.phone' => 'unique:addresses,phone'
         ];

@@ -2,6 +2,28 @@
 
 @section('title', $data['title'])
 
+@push('stylesheet')
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+@endpush
+
+@push('javascript')
+<!-- Select2 -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
+    @isset($data['teacher']->user->user_detail)
+    $('#gender').val("{{ $data['teacher']->user->user_detail->gender }}").change();
+    $('#religion').val("{{ $data['teacher']->user->user_detail->religion }}").change();
+    @endisset
+});
+</script>
+@endpush
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -71,7 +93,7 @@
                                     <div class="form-group row">
                                         <label for="place_of_birth" class="col-sm-3 col-form-label">Tempat Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') ?? $data['teacher']->user->user_detail->place_of_birth }}">
+                                            <input type="text" class="form-control @error('place_of_birth') is-invalid @enderror" id="place_of_birth" name="place_of_birth" value="{{ old('place_of_birth') ?? $data['teacher']->user->user_detail->place_of_birth ?? '' }}">
                                             @error('place_of_birth')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -82,7 +104,7 @@
                                     <div class="form-group row">
                                         <label for="date_of_birth" class="col-sm-3 col-form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') ?? $data['teacher']->user->user_detail->date_of_birth }}">
+                                            <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth') ?? $data['teacher']->user->user_detail->date_of_birth ?? '' }}">
                                             @error('date_of_birth')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -93,10 +115,10 @@
                                     <div class="form-group row">
                                         <label for="gender" class="col-sm-3 col-form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" value="{{ $data['teacher']->user->user_detail->gender }}">
-                                                <option disabled>Pilih Jenis Kelamin</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
+                                            <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" value="{{ $data['teacher']->user->user_detail->gender ?? '' }}">
+                                                <option selected disabled>Pilih Jenis Kelamin</option>
+                                                <option value="Male">Laki-laki</option>
+                                                <option value="Female">Perempuan</option>
                                             </select>
                                             @error('gender')
                                             <span class="invalid-feedback" role="alert">
@@ -108,8 +130,8 @@
                                     <div class="form-group row">
                                         <label for="religion" class="col-sm-3 col-form-label">Agama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <select class="form-control @error('religion') is-invalid @enderror" id="religion" name="religion" value="{{ old('religion') ?? $data['teacher']->user->user_detail->gender }}">
-                                                <option disabled>Pilih Agama</option>
+                                            <select class="form-control @error('religion') is-invalid @enderror" id="religion" name="religion" value="{{ old('religion') ?? $data['teacher']->user->user_detail->gender ?? '' }}">
+                                                <option selected disabled>Pilih Agama</option>
                                                 <option value="Islam">Islam</option>
                                                 <option value="Kristen">Kristen</option>
                                                 <option value="Hindu">Hindu</option>
@@ -126,7 +148,7 @@
                                     <div class="form-group row">
                                         <label for="education" class="col-sm-3 col-form-label">Pendidikan <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('education') is-invalid @enderror" id="education" name="education" value="{{ old('education') ?? $data['teacher']->education }}">
+                                            <input type="text" class="form-control @error('education') is-invalid @enderror" id="education" name="education" value="{{ old('education') ?? $data['teacher']->education ?? '' }}">
                                             @error('education')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -136,7 +158,7 @@
                                     </div>
                                     <div class="form-group row">
                                         <label for="profile_picture" class="col-sm-3 col-form-label">Foto Profil</label>
-                                        @if ($data['teacher']->user->user_detail->profile_picture)
+                                        @if (isset($data['teacher']->user->user_detail->profile_picture))
                                         <div class="col-sm-4">
                                             <img class="img-fluid" src="{{ asset('storage/profile-pictures/'. $data['teacher']->user->user_detail->profile_picture) }}" alt="Foto Profil">
                                         </div>
@@ -170,7 +192,7 @@
                                     <div class="form-group row">
                                         <label for="address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $data['teacher']->user->address->address }}</textarea>
+                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $data['teacher']->user->address->address  ?? ''}}</textarea>
                                             @error('address')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -181,7 +203,7 @@
                                     <div class="form-group row">
                                         <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $data['teacher']->user->address->email }}">
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $data['teacher']->user->address->email ?? '' }}">
                                             @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -192,7 +214,7 @@
                                     <div class="form-group row">
                                         <label for="phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $data['teacher']->user->address->phone }}">
+                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $data['teacher']->user->address->phone ?? '' }}">
                                             @error('phone')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>

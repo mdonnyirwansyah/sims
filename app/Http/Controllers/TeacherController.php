@@ -162,14 +162,15 @@ class TeacherController extends Controller
             DB::beginTransaction();
 
             $teacher->user()->update([
-                'role_id' => 3,
                 'name' => $request->name,
                 'username' => $request->nip,
             ]);
+            
             $teacher->update([
                 'nip' => $request->nip,
                 'education' => $request->education
             ]);
+
             if ($request->profile_picture) {
                 if ($teacher->user->user_detail->profile_picture) {
                     Storage::delete('public/profile-pictures/'.$teacher->user->user_detail->profile_picture);
@@ -182,18 +183,32 @@ class TeacherController extends Controller
                     $profile_picture
                 );
             }
-            $teacher->user->user_detail()->update([
+
+            $userDetail = [
                 'place_of_birth' => $request->place_of_birth,
                 'date_of_birth' => $request->date_of_birth,
                 'gender' => $request->gender,
                 'religion' => $request->religion,
-                'profile_picture' => $request->profile_picture ? $profile_picture : $teacher->user->user_detail->profile_picture
-            ]);
-            $teacher->user->address()->update([
+                'profile_picture' => $profile_picture ?? $teacher->user->user_detail->profile_picture ?? null
+            ];
+
+            $userAddress = [
                 'address' => $request->address,
                 'email' => $request->email,
                 'phone' => $request->phone
-            ]);
+            ];
+            
+            if ($teacher->user->user_detail === null) {
+                $teacher->user->user_detail()->create($userDetail);
+            } else {
+                $teacher->user->user_detail()->update($userDetail);
+            }
+
+            if ($teacher->user->address === null) {
+                $teacher->user->address()->create($userAddress);
+            } else {
+                $teacher->user->address()->update($userAddress);
+            }
 
             DB::commit();
         } catch (\Exception $e) {

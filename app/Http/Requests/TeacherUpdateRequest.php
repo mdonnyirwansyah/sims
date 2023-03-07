@@ -32,8 +32,8 @@ class TeacherUpdateRequest extends FormRequest
             'education' => 'required',
             'profile_picture' => 'image|max:1024',
             'address' => 'required',
-            'email' => 'required|unique:addresses,email,'.$this->teacher->user->address->id,
-            'phone' => 'required|unique:addresses,phone,'.$this->teacher->user->address->id
+            'email' => $this->teacher->user->address()->count() > 0 ? 'required|unique:addresses,email,'.$this->teacher->user->address->id : 'required|unique:addresses,email',
+            'phone' => $this->teacher->user->address()->count() > 0  ? 'required|unique:addresses,phone,'.$this->teacher->user->address->id : 'required|unique:addresses,phone'
         ];
     }
 
