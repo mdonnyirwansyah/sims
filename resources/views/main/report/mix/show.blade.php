@@ -158,7 +158,7 @@
                     </div>
                     <!-- /.card-body -->
                     <div class="card-footer">
-                        <button type="button" class="btn btn-primary float-right">Cetak</button>
+                        <a href="{{ route("report.print", $data['studentData']['id']) }}" target="_blank" class="btn btn-primary float-right">Cetak</a>
                     </div>
                 </div>
                 <!-- /.card -->

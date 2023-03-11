@@ -107,5 +107,6 @@ Route::middleware('auth')->group(function () {
         Route::post('get-data', 'getData')->name('getData');
         Route::get('show/{report}', 'show')->name('show');
         Route::get('show', 'showByFilter')->name('show-by-filter');
+        Route::get('print/{report}', 'print')->name('print');
     });
 });

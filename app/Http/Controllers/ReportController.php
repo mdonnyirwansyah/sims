@@ -6,6 +6,7 @@ use App\Http\Requests\ReportFilterRequest;
 use App\Models\Report;
 use App\Models\SchoolYear;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -56,13 +57,13 @@ class ReportController extends Controller
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->get();
+                }])->groupBy('semester')->get();
             } else {
                 $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->get();
+                }])->groupBy('semester')->get();
             }
         } else {
             if ($user->role->name === 'Teacher') {
@@ -70,13 +71,13 @@ class ReportController extends Controller
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->get();
+                }])->groupBy('semester')->get();
             } else {
                 $reports = Report::whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->get();
+                }])->groupBy('semester')->get();
             }
         }
 
@@ -112,6 +113,7 @@ class ReportController extends Controller
     {
         $student = Student::find($report->student_id);
         $studentData = [
+            'id' => $student->id,
             'name' => $student->user->name,
             'nis_nisn' => $student->nis. ' / ' .$student->nisn,
             'class_room' => $report->class_room->name,
@@ -154,5 +156,32 @@ class ReportController extends Controller
         ];
         
         return view('main.report.student.show', compact('data'));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Report  $report
+     * @return \Illuminate\Http\Response
+     */
+    public function print(Report $report)
+    {
+        $student = Student::find($report->student_id);
+        $studentData = [
+            'name' => $student->user->name,
+            'nis_nisn' => $student->nis. ' / ' .$student->nisn,
+            'class_room' => $report->class_room->name,
+            'semester' => $report->semester,
+            'school_year' => $report->class_room->school_year->name
+        ];
+        $reports = $student->reports()->where('class_room_id', $report->class_room_id)->where('semester', $report->semester)->get();
+        $data = [
+            'studentData' => $studentData,
+            'reports' => $reports
+        ];
+        $pdf = Pdf::loadView('main.report.mix.print', compact('data'))
+        ->setPaper('a4');
+
+        return $pdf->stream('e-raport-'. $student->nis);
     }
 }
