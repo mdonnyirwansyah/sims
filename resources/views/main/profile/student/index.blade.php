@@ -22,6 +22,12 @@ $(document).ready(function() {
     @endif
 });
 </script>
+
+@if($message = Session::get('ok'))
+<script>
+  toastr.success('{{ $message }}', 'Pemberitahuan,');
+</script>
+@endif
 @endpush
 
 @section('content')
@@ -87,7 +93,16 @@ $(document).ready(function() {
                     <div class="card-body">
                         <div class="tab-content">
                             <div class="active tab-pane" id="identity">
-                                <form class="form-horizontal">
+                                @if($message = Session::get('failed'))
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                                    {{ $message }}
+                                </div>
+                                @endif
+                                <form class="form-horizontal" action="{{ route('profile.update', Auth::user()->id) }}" method="post" enctype="multipart/form-data">
+                                    @method('put')
+                                    @csrf
                                     <div class="form-group row">
                                         <div class="col-sm-12 col-form-label pb-0">
                                             <h2 class="card-title font-weight-bold text-muted">Identitas</h2>
@@ -106,25 +121,15 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="nis" class="col-sm-3 col-form-label">NIS <span class="text-danger">*</span></label>
+                                        <label for="nis" class="col-sm-3 col-form-label">NIS</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('nis') is-invalid @enderror" id="nis" name="nis" value="{{ old('nis') ?? $data['user']->student->nis ?? '' }}">
-                                            @error('nis')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="nis" name="nis" value="{{ old('nis') ?? $data['user']->student->nis ?? '' }}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="nisn" class="col-sm-3 col-form-label">NISN <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('nisn') is-invalid @enderror" id="nisn" name="nisn" value="{{ old('nisn') ?? $data['user']->student->nisn ?? '' }}">
-                                            @error('nisn')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="nisn" name="nisn" value="{{ old('nisn') ?? $data['user']->student->nisn ?? '' }}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group row">

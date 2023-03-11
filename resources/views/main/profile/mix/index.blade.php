@@ -16,12 +16,97 @@ $(document).ready(function() {
     $('.select2').select2({
       theme: 'bootstrap4'
     });
-    @if ($data['user']->user_detail()->count() > 0) 
+    @if ($data['user']->user_detail !== null) 
         $('#gender').val("{{ $data['user']->user_detail->gender }}").change();
         $('#religion').val("{{ $data['user']->user_detail->religion }}").change();
     @endif
+    $('#form-address').submit(function (e) {
+        e.preventDefault();
+        $('#submit-address-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-address-button').prop('disabled', false);
+                } else {
+                    $('#failed-address').removeClass('d-none');
+                    $('#failed-address-message').empty();
+                    $('#failed-address-message').append(response.failed);
+                    $('#submit-address-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-address-button').prop('disabled', false);
+            }
+        });
+    });
+    $('#form-password').submit(function (e) {
+        e.preventDefault();
+        $('#submit-password-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-password-button').prop('disabled', false);
+                } else {
+                    $('#failed-password').removeClass('d-none');
+                    $('#failed-password-message').empty();
+                    $('#failed-password-message').append(response.failed);
+                    $('#submit-password-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-password-button').prop('disabled', false);
+            }
+        });
+    });
 });
+function printErrorMsg (msg) {
+    $.each(msg, function (key, value) {
+        var key = key.replace(/[^a-zA-Z0-9]/g, '_');
+        $('#'+key).addClass('is-invalid');
+        $('.'+key+'_err').text(value);
+        $('#'+key+'_err').text(value);
+        $('#'+key).change(function () {
+            $('#'+key).removeClass('is-invalid');
+        });
+    });
+}
 </script>
+
+@if($message = Session::get('ok'))
+<script>
+  toastr.success('{{ $message }}', 'Pemberitahuan,');
+</script>
+@endif
 @endpush
 
 @section('content')
@@ -76,16 +161,25 @@ $(document).ready(function() {
                 <div class="card">
                     <div class="card-header p-2">
                         <ul class="nav nav-pills">
-                            <li class="nav-item"><a class="nav-link active" href="#identity" data-toggle="tab">Identitas</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#address" data-toggle="tab">Alamat</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#account" data-toggle="tab">Akun</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="#tab-identity" data-toggle="tab">Identitas</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-address" data-toggle="tab">Alamat</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-account" data-toggle="tab">Akun</a></li>
                         </ul>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <div class="tab-content">
-                            <div class="active tab-pane" id="identity">
-                                <form class="form-horizontal">
+                            <div class="active tab-pane" id="tab-identity">
+                                @if($message = Session::get('failed'))
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                                    {{ $message }}
+                                </div>
+                                @endif
+                                <form class="form-horizontal" action="{{ route('profile.update', $data['user']->id) }}" method="post" enctype="multipart/form-data">
+                                    @method('put')
+                                    @csrf
                                     <div class="form-group row">
                                         <label for="name" class="col-sm-3 col-form-label">Nama <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
@@ -98,9 +192,9 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="nip" class="col-sm-3 col-form-label">NIP <span class="text-danger">*</span></label>
+                                        <label for="nip" class="col-sm-3 col-form-label">NIP @if ($data['user']->role->name === 'Administrator') <span class="text-danger">*</span> @endif</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip" name="nip" value="{{ old('nip') ?? $data['user']->teacher->nip ?? '' }}">
+                                            <input type="text" class="form-control @error('nip') is-invalid @enderror" id="nip" name="nip" value="{{ old('nip') ?? $data['user']->teacher->nip ?? '' }}" @if ($data['user']->role->name !== 'Administrator') readonly @endif>
                                             @error('nip')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -193,73 +287,71 @@ $(document).ready(function() {
                                 </form>
                             </div>
                             <!-- /.tab-pane -->
-                            <div class="tab-pane" id="address">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-address">
+                                <div id="failed-address" class="d-none alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                                    <p id="failed-message"></p>
+                                </div>
+                                <form id="form-address" class="form-horizontal" action="{{ route('profile.update-address', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <div class="form-group row">
                                         <label for="address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $data['user']->address->address ?? '' }}</textarea>
-                                            @error('address')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <textarea class="form-control" id="address" name="address">{{ $data['user']->address->address ?? '' }}</textarea>
+                                            <small class="invalid-feedback address_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $data['user']->address->email ?? '' }}">
-                                            @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') ?? $data['user']->address->email ?? '' }}">
+                                            <small class="invalid-feedback email_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $data['user']->address->phone ?? '' }}">
-                                            @error('phone')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="phone" name="phone" value="{{ $data['user']->address->phone ?? '' }}">
+                                            <small class="invalid-feedback phone_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="offset-sm-3 col-sm-9">
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                            <button type="submit" id="submit-address-button" class="btn btn-primary">Simpan</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
                             <!-- /.tab-pane -->
 
-                            <div class="tab-pane" id="account">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-account">
+                                <form id="form-password" class="form-horizontal" action="{{ route('profile.update-account', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <div class="form-group row">
                                         <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="current_password" name="current_password">
+                                            <input type="password" class="form-control" id="current_password" name="current_password">
+                                            <small class="invalid-feedback current_password_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="new_password" class="col-sm-3 col-form-label">Password Baru <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="new_password" name="new_password">
+                                            <input type="password" class="form-control" id="new_password" name="new_password">
+                                            <small class="invalid-feedback new_password_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password <span class="text-danger">*</span></label>
+                                        <label for="new_password_confirmation" class="col-sm-3 col-form-label">Konfirmasi Password Baru<span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="confirm_password" name="confirm_password">
+                                            <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation">
+                                            <small class="invalid-feedback new_password_confirmation_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="offset-sm-3 col-sm-9">
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                            <button type="submit" id="submit-password-button" class="btn btn-primary">Simpan</button>
                                         </div>
                                     </div>
                                 </form>

@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Subjects;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class BerandaController extends Controller
@@ -26,20 +27,33 @@ class BerandaController extends Controller
         if ($user->role->name === 'Administrator') {
             $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
             $teachers = Teacher::whereRelation('user', 'role_id', 2)->get()->count();
-            $students = Student::all()->count();
             $subjects = Subjects::all()->count();
             if ($request->school_year_id) {
-                $classRooms = ClassRoom::where('school_year_id', $request->school_year_id)->get()->count();
+                $classRooms = ClassRoom::where('school_year_id', $request->school_year_id)->get();
+                $classRoomTotal = $classRooms->count();
+                if ($classRoomTotal > 0) {
+                    $studentClassRooms = collect($classRooms)->map(function ($item) {
+                        return $item->id;
+                    });
+                    $studentTotal = DB::table('class_room_student')->whereIn('class_room_id', $studentClassRooms)->get()->count();
+                } else {
+                    $studentTotal = 0;
+                }
             } else {
-                $classRooms = ClassRoom::all()->count();
+                $classRooms = ClassRoom::all();
+                $classRoomTotal = $classRooms->count();
+                $studentClassRooms = collect($classRooms)->map(function ($item) {
+                    return $item->id;
+                });
+                $studentTotal = DB::table('class_room_student')->whereIn('class_room_id', $studentClassRooms)->get()->count();
             }
             
             $data = [
                 'title' => 'Beranda',
                 'schoolYears' => $schoolYears,
-                'classRooms' => $classRooms,
+                'classRooms' => $classRoomTotal,
                 'teachers' => $teachers,
-                'students' => $students,
+                'students' => $studentTotal,
                 'subjects' => $subjects
             ];
             

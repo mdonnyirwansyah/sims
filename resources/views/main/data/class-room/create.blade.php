@@ -37,7 +37,7 @@ $(document).ready(function() {
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('data.class-room.index') }}">Data Guru</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('data.class-room.index') }}">Data Kelas</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>

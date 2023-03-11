@@ -10,6 +10,7 @@ use App\Models\Report;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -39,16 +40,35 @@ class GradeController extends Controller
      */
     public function getData(Request $request)
     {
+        $user = Auth::user();
         if ($request->school_year_id || $request->semester || $request->class_room_id || $request->type) {
-            $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('student.user')->with(['student.user' => function ($query) {
-            $query->orderBy('name', 'ASC');
-        }])->get();
+            if ($user->role->name === 'Teacher') {
+                $reports = Report::whereRelation('class_room', 'teacher_id', $user->teacher->id)->whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->whereHas('student.user')->with(['student.user' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->get();
+            } else {
+                $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->whereHas('student.user')->with(['student.user' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->get();
+            }
         } else {
-            $reports = Report::whereHas('class_room')->with(['class_room' => function ($query) {
-                $query->orderBy('name', 'ASC');
-            }])->whereHas('student.user')->with(['student.user' => function ($query) {
-            $query->orderBy('name', 'ASC');
-        }])->get();
+            if ($user->role->name === 'Teacher') {
+                $reports = Report::whereRelation('class_room', 'teacher_id', $user->teacher->id)->whereHas('class_room')->with(['class_room' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->whereHas('student.user')->with(['student.user' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->get();
+            } else {
+                $reports = Report::whereHas('class_room')->with(['class_room' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->whereHas('student.user')->with(['student.user' => function ($query) {
+                    $query->orderBy('name', 'ASC');
+                }])->get();
+            }
         }
 
         return DataTables::of($reports)

@@ -28,4 +28,12 @@ class Teacher extends Model
     {
         return $this->hasMany(LessonSchedule::class);
     }
+
+    /**
+     * Get the class_rooms for the teacher.
+     */
+    public function class_rooms()
+    {
+        return $this->hasMany(ClassRoom::class);
+    }
 }

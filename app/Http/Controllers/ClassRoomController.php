@@ -10,6 +10,7 @@ use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class ClassRoomController extends Controller
@@ -82,7 +83,7 @@ class ClassRoomController extends Controller
         }])->get();
         
         $data = [
-            'title' => 'Data Kelas',
+            'title' => 'Tambah Kelas',
             'schoolYears' => $schoolYears,
             'teachers' => $teachers
         ];
@@ -240,9 +241,14 @@ class ClassRoomController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function showBySchoolYear(Request  $request)
+    public function showBySchoolYear(Request $request)
     {
-        $classRooms = ClassRoom::select(['id', 'name'])->where('school_year_id', $request->school_year_id)->orderBy('class', 'ASC')->orderBy('name', 'ASC')->get();
+        $user = Auth::user();
+        if ($user->role->name === 'Teacher') {
+            $classRooms = $user->teacher->class_rooms()->where('school_year_id', $request->school_year_id)->get();
+        } else {
+            $classRooms = ClassRoom::select(['id', 'name'])->where('school_year_id', $request->school_year_id)->orderBy('class', 'ASC')->orderBy('name', 'ASC')->get();
+        }
 
         return response()->json($classRooms);
     }
