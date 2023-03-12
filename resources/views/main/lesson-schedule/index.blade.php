@@ -48,8 +48,8 @@ $(document).ready(function() {
             type: 'post',
             data: function (d) {
                 d.school_year_id = $('#school_year_id').val();
+                d.teacher_id = $('#class_room_id').val();
                 d.semester = $('#semester').val();
-                d.teacher_id = $('#teacher_id').val();
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -63,8 +63,8 @@ $(document).ready(function() {
                 searchable: false
             },
             {data: 'school_year', name: 'school_year'},
-            {data: 'semester', name: 'semester'},
             {data: 'class_room', name: 'class_room'},
+            {data: 'semester', name: 'semester'},
             {data: 'teacher', name: 'teacher'},
             {data: 'subjects', name: 'subjects'},
             {data: 'day', name: 'day'},

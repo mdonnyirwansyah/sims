@@ -94,7 +94,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="semester" class="col-sm-3 col-form-label">Semester</label>
+                                <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('semester') is-invalid @enderror" id="semester" name="semester">
                                         <option disabled>Pilih Semester</option>
@@ -109,7 +109,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="teacher_id" class="col-sm-3 col-form-label">Guru</label>
+                                <label for="teacher_id" class="col-sm-3 col-form-label">Guru <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id">
                                         <option disabled>Pilih Guru</option>

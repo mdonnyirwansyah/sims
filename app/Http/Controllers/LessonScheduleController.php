@@ -40,9 +40,9 @@ class LessonScheduleController extends Controller
     public function getData(Request $request)
     {
         if ($request->school_year_id || $request->class_room_id || $request->semester) {
-            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->orderBy('day_id', 'ASC')->get();
+            $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->orderBy('day_id', 'ASC')->get();
         } else {
-            $lessonSchedules = LessonSchedule::orderBy('day_id', 'ASC')->get();
+            $lessonSchedules = LessonSchedule::whereRelation('school_year', 'status', '1')->orderBy('day_id', 'ASC')->get();
         }
 
         return DataTables::of($lessonSchedules)
@@ -147,7 +147,7 @@ class LessonScheduleController extends Controller
         $days = Day::orderBy('id', 'ASC')->get();
         
         $data = [
-            'title' => 'Tambah Jadwal Pelajaran',
+            'title' => 'Edit Jadwal Pelajaran',
             'lessonSchedule' => $lessonSchedule,
             'schoolYears' => $schoolYears,
             'teachers' => $teachers,

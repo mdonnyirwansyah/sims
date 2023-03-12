@@ -307,7 +307,7 @@
                                     <hr>
                                     <input type="hidden" name="guardian[type]" value="Guardian">
                                     <div class="form-group row">
-                                        <label for="guardian_name" class="col-sm-3 col-form-label">Name</label>
+                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') }}">
                                             @error('guardian.name')

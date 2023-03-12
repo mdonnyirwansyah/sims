@@ -100,7 +100,7 @@
                         <ol id="list" type="A">
                             @foreach ($data['reports'] as $report)
                             <li>
-                                {{ $report->type }}
+                                <h2 style="font-size: 12px; font-weight: bold;">{{ $report->type }}</h2>
                                 <div class="table-responsive">
                                     <table id="table" class="table" style="width: 100%;">
                                         <thead>
@@ -157,9 +157,6 @@
                         </ol>
                     </div>
                     <!-- /.card-body -->
-                    <div class="card-footer">
-                        <button type="button" class="btn btn-primary float-right">Cetak</button>
-                    </div>
                 </div>
                 <!-- /.card -->
             </div>
