@@ -343,17 +343,23 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        $father = $student->families()->where('type', 'Father')->first();
+        $guardian = $student->families()->where('type', 'Guardian')->first();
+
         try {
             DB::beginTransaction();
-            if ($student->user->user_detail->profile_picture) {
+            if ($student->user->user_detail) {
                 Storage::delete('public/profile-pictures/'.$student->user->user_detail->profile_picture);
             }
-            
-            $families = $student->families()->get();
-            $families[0]->address()->delete();
-            if ($families->count() === 3) {
-                $families[2]->address()->delete();
+
+            if ($father) {
+                $father->address()->delete();
             }
+
+            if ($guardian) {
+                $guardian->address()->delete();
+            }
+
             $student->user->address()->delete();
             $student->user()->delete();
 

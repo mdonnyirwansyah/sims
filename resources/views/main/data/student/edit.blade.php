@@ -344,7 +344,7 @@ $(document).ready(function() {
                                     <hr>
                                     <input type="hidden" name="guardian[type]" value="Guardian">
                                     <div class="form-group row">
-                                        <label for="guardian_name" class="col-sm-3 col-form-label">Name {!! $data['guardian']['name'] ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama {!! $data['guardian']['name'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') ?? $data['guardian']['name'] ?? '' }}">
                                             @error('guardian.name')

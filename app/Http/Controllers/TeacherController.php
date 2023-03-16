@@ -230,7 +230,7 @@ class TeacherController extends Controller
     {
         try {
             DB::beginTransaction();
-            if ($teacher->user->user_detail->profile_picture) {
+            if ($teacher->user->user_detail) {
                 Storage::delete('public/profile-pictures/'.$teacher->user->user_detail->profile_picture);
             }
             $teacher->user->address()->delete();
