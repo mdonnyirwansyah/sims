@@ -20,7 +20,154 @@ $(document).ready(function() {
         $('#gender').val("{{ $data['user']->user_detail->gender }}").change();
         $('#religion').val("{{ $data['user']->user_detail->religion }}").change();
     @endif
+    $('#form-address').submit(function (e) {
+        e.preventDefault();
+        $('#submit-address-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-address-button').prop('disabled', false);
+                } else {
+                    $('#failed-address').removeClass('d-none');
+                    $('#failed-address-message').empty();
+                    $('#failed-address-message').append(response.failed);
+                    $('#submit-address-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-address-button').prop('disabled', false);
+            }
+        });
+    });
+    $('#form-parents').submit(function (e) {
+        e.preventDefault();
+        $('#submit-parents-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-parents-button').prop('disabled', false);
+                } else {
+                    $('#failed-parents').removeClass('d-none');
+                    $('#failed-parents-message').empty();
+                    $('#failed-parents-message').append(response.failed);
+                    $('#submit-parents-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-parents-button').prop('disabled', false);
+            }
+        });
+    });
+    $('#form-guardian').submit(function (e) {
+        e.preventDefault();
+        $('#submit-guardian-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-guardian-button').prop('disabled', false);
+                } else {
+                    $('#failed-guardian').removeClass('d-none');
+                    $('#failed-guardian-message').empty();
+                    $('#failed-guardian-message').append(response.failed);
+                    $('#submit-guardian-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-guardian-button').prop('disabled', false);
+            }
+        });
+    });
+    $('#form-password').submit(function (e) {
+        e.preventDefault();
+        $('#submit-password-button').prop('disabled', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'post',
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response.ok) {
+                    toastr.success(response.ok, 'Pemberitahuan,');
+                } else if (response.error) {
+                    printErrorMsg(response.error);
+                    $('#submit-password-button').prop('disabled', false);
+                } else {
+                    $('#failed-password').removeClass('d-none');
+                    $('#failed-password-message').empty();
+                    $('#failed-password-message').append(response.failed);
+                    $('#submit-password-button').prop('disabled', false);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + '\n' + xhr.responseText + '\n' + thrownError);
+                $('#submit-password-button').prop('disabled', false);
+            }
+        });
+    });
 });
+function printErrorMsg (msg) {
+    $.each(msg, function (key, value) {
+        var key = key.replace(/[^a-zA-Z0-9]/g, '_');
+        $('#'+key).addClass('is-invalid');
+        $('.'+key+'_err').text(value);
+        $('#'+key+'_err').text(value);
+        $('#'+key).change(function () {
+            $('#'+key).removeClass('is-invalid');
+        });
+    });
+}
 </script>
 
 @if($message = Session::get('ok'))
@@ -82,17 +229,17 @@ $(document).ready(function() {
                 <div class="card">
                     <div class="card-header p-2">
                         <ul class="nav nav-pills">
-                            <li class="nav-item"><a class="nav-link active" href="#identity" data-toggle="tab">Identitas</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#address" data-toggle="tab">Alamat</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#parents" data-toggle="tab">Orang Tua</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#guardian" data-toggle="tab">Wali</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#account" data-toggle="tab">Akun</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="#tab-identity" data-toggle="tab">Identitas</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-address" data-toggle="tab">Alamat</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-parents" data-toggle="tab">Orang Tua</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-guardian" data-toggle="tab">Wali</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab-account" data-toggle="tab">Akun</a></li>
                         </ul>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <div class="tab-content">
-                            <div class="active tab-pane" id="identity">
+                            <div class="active tab-pane" id="tab-identity">
                                 @if($message = Session::get('failed'))
                                 <div class="alert alert-danger alert-dismissible">
                                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -230,39 +377,33 @@ $(document).ready(function() {
                                 </form>
                             </div>
                             <!-- /.tab-pane -->
-                            <div class="tab-pane" id="address">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-address">
+                                <div id="failed-address" class="d-none alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                    <h5><i class="icon fas fa-ban"></i>Pemberitahuan,</h5>
+                                    <p id="failed-message"></p>
+                                </div>
+                                <form id="form-address" class="form-horizontal" action="{{ route('profile.update-address', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <div class="form-group row">
                                         <label for="address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address">{{ old('address') ?? $data['user']->address->address ?? '' }}</textarea>
-                                            @error('address')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <textarea class="form-control" id="address" name="address">{{ $data['user']->address->address ?? '' }}</textarea>
+                                            <small class="invalid-feedback address_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') ?? $data['user']->address->email ?? '' }}">
-                                            @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ $data['user']->address->email ?? '' }}">
+                                            <small class="invalid-feedback email_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') ?? $data['user']->address->phone ?? '' }}">
-                                            @error('phone')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="phone" name="phone" value="{{ $data['user']->address->phone ?? '' }}">
+                                            <small class="invalid-feedback phone_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -274,8 +415,9 @@ $(document).ready(function() {
                             </div>
                             <!-- /.tab-pane -->
 
-                            <div class="tab-pane" id="parents">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-parents">
+                                <form id="form-parents" class="form-horizontal" action="{{ route('profile.update-parents', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <div class="form-group row">
                                         <div class="col-sm-12 col-form-label pb-0">
                                             <h2 class="card-title font-weight-bold text-muted">Nama</h2>
@@ -286,24 +428,16 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_name" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.name') is-invalid @enderror" id="father_name" name="father[name]" value="{{ old('father.name') ?? $data['user']->student->families[0]->name ?? '' }}">
-                                            @error('father.name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="father_name" name="father[name]" value="{{ $data['father']['name'] ?? '' }}">
+                                            <small class="invalid-feedback father_name_err"></small>
                                         </div>
                                     </div>
                                     <input type="hidden" name="mother[type]" value="Mother">
                                     <div class="form-group row">
                                         <label for="mother_name" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('mother.name') is-invalid @enderror" id="mother_name" name="mother[name]" value="{{ old('mother.name') ?? $data['user']->student->families[1]->name ?? '' }}">
-                                            @error('mother.name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="mother_name" name="mother[name]" value="{{ $data['mother']['name'] ?? '' }}">
+                                            <small class="invalid-feedback mother_name_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -315,23 +449,15 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_occupation" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.occupation') is-invalid @enderror" id="father_occupation" name="father[occupation]" value="{{ old('father.occupation') ?? $data['user']->student->families[0]->occupation ?? '' }}">
-                                            @error('father.occupation')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="father_occupation" name="father[occupation]" value="{{ $data['father']['occupation'] ?? '' }}">
+                                            <small class="invalid-feedback father_occupation_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="mother_occupation" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('mother.occupation') is-invalid @enderror" id="mother_occupation" name="mother[occupation]" value="{{ old('mother.occupation') ?? $data['user']->student->families[1]->occupation ?? '' }}">
-                                            @error('mother.occupation')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="mother_occupation" name="mother[occupation]" value="{{ $data['mother']['occupation'] ?? '' }}">
+                                            <small class="invalid-feedback mother_occupation_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -343,23 +469,15 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('father.address') is-invalid @enderror" id="father_address" name="father[address]">{{ old('father.address') ?? $data['user']->student->families[0]->address->address ?? '' }}</textarea>
-                                            @error('father.address')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <textarea class="form-control" id="father_address" name="father[address]">{{ $data['father']['address'] ?? '' }}</textarea>
+                                            <small class="invalid-feedback father_address_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="father_phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.phone') is-invalid @enderror" id="father_phone" name="father[phone]" value="{{ old('father.phone') ?? $data['user']->student->families[0]->address->phone ?? '' }}">
-                                            @error('father.phone')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="father_phone" name="father[phone]" value="{{ $data['father']['phone'] ?? '' }}">
+                                            <small class="invalid-feedback father_phone_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -371,51 +489,36 @@ $(document).ready(function() {
                             </div>
                             <!-- /.tab-pane -->
 
-                            <div class="tab-pane" id="guardian">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-guardian">
+                                <form id="form-guardian" class="form-horizontal" action="{{ route('profile.update-guardian', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <input type="hidden" name="guardian[type]" value="Guardian">
                                     <div class="form-group row">
-                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama {!! $data['user']->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_name" class="col-sm-3 col-form-label">Nama {!! $data['guardian'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') ?? $data['user']->student->families[2]->name ?? '' }}">
-                                            @error('guardian.name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="guardian_name" name="guardian[name]" value="{{ $data['guardian']['name'] ?? '' }}">
+                                            <small class="invalid-feedback guardian_name_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan {!! $data['user']->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan {!! $data['guardian'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.occupation') is-invalid @enderror" id="guardian_occupation" name="guardian[occupation]" value="{{ old('guardian.occupation') ?? $data['user']->student->families[2]->occupation ?? '' }}">
-                                            @error('guardian.occupation')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="guardian_occupation" name="guardian[occupation]" value="{{ $data['guardian']['occupation'] ?? '' }}">
+                                            <small class="invalid-feedback guardian_occupation_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat {!! $data['user']->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat {!! $data['guardian'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('guardian.address') is-invalid @enderror" id="guardian_address" name="guardian[address]">{{ old('guardian.address') ?? $data['user']->student->families[2]->address->address ?? '' }}</textarea>
-                                            @error('guardian.address')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <textarea class="form-control" id="guardian_address" name="guardian[address]">{{ $data['guardian']['address'] ?? '' }}</textarea>
+                                            <small class="invalid-feedback guardian_address_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP {!! $data['user']->student->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP {!! $data['guardian'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.phone') is-invalid @enderror" id="guardian_phone" name="guardian[phone]" value="{{ old('guardian.phone') ?? $data['user']->student->families[2]->address->phone ?? '' }}">
-                                            @error('guardian.phone')
-                                            <span class="invalid-feedback" role="alert">
-                                                <small>{{ $message }}</small>
-                                            </span>
-                                            @enderror
+                                            <input type="text" class="form-control" id="guardian_phone" name="guardian[phone]" value="{{ $data['guardian']['phone'] ?? '' }}">
+                                            <small class="invalid-feedback guardian_phone_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -427,24 +530,28 @@ $(document).ready(function() {
                             </div>
                             <!-- /.tab-pane -->
 
-                            <div class="tab-pane" id="account">
-                                <form class="form-horizontal">
+                            <div class="tab-pane" id="tab-account">
+                                <form id="form-password" class="form-horizontal" action="{{ route('profile.update-account', $data['user']->id) }}" method="post">
+                                    @method('put')
                                     <div class="form-group row">
                                         <label for="current_password" class="col-sm-3 col-form-label">Password Sekarang <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="current_password" name="current_password">
+                                            <input type="password" class="form-control" id="current_password" name="current_password">
+                                            <small class="invalid-feedback current_password_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="new_password" class="col-sm-3 col-form-label">Password Baru <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="new_password" name="new_password">
+                                            <input type="password" class="form-control" id="new_password" name="new_password">
+                                            <small class="invalid-feedback new_password_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="confirm_password" class="col-sm-3 col-form-label">Konfirmasi Password <span class="text-danger">*</span></label>
+                                        <label for="new_password_confirmation" class="col-sm-3 col-form-label">Konfirmasi Password Baru<span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="confirm_password" name="confirm_password">
+                                            <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation">
+                                            <small class="invalid-feedback new_password_confirmation_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">

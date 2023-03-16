@@ -305,7 +305,7 @@ function printErrorMsg (msg) {
                                     <div class="form-group row">
                                         <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') ?? $data['user']->address->email ?? '' }}">
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ $data['user']->address->email ?? '' }}">
                                             <small class="invalid-feedback email_err"></small>
                                         </div>
                                     </div>

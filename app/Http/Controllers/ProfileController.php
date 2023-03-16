@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AccountProfileRequest;
 use App\Http\Requests\AddressProfileRequest;
+use App\Http\Requests\GuardianProfileRequest;
 use App\Http\Requests\IdentityProfileRequest;
+use App\Http\Requests\ParentsProfileRequest;
+use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,17 +24,46 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        $data = [
-            'title' => 'Profil',
-            'user' => $user
-        ];
 
         if($user->role->name === 'Student') {
+            $fatherIdentity = $user->student->families()->where('type', 'Father')->first();
+            $fatherAddress = $fatherIdentity ? $fatherIdentity->address()->first() : null;
+            $motherIdentity = $user->student->families()->where('type', 'Mother')->first();
+            $guardianIdentity = $user->student->families()->where('type', 'Guardian')->first();
+            $guardianAddress = $guardianIdentity ? $guardianIdentity->address()->first() : null;
+            $father = [
+                'name' => $fatherIdentity->name ?? '',
+                'occupation' => $fatherIdentity->occupation ?? '',
+                'address' => $fatherAddress->address ?? '',
+                'phone' => $fatherAddress->phone ?? ''
+            ];
+            $mother = [
+                'name' => $motherIdentity->name ?? '',
+                'occupation' => $motherIdentity->occupation ?? ''
+            ];
+            $guardian = [
+                'name' => $guardianIdentity->name ?? '',
+                'occupation' => $guardianIdentity->occupation ?? '',
+                'address' => $guardianAddress->address ?? '',
+                'phone' => $guardianAddress->phone ?? ''
+            ];
+            $data= [
+                'title' => 'Profil',
+                'user' => $user,
+                'father' => $father,
+                'mother' => $mother,
+                'guardian' => $guardian
+            ];
+
             return view('main.profile.student.index', compact('data'));
+        } else {
+            $data= [
+                'title' => 'Profil',
+                'user' => $user
+            ];
+
+            return view('main.profile.mix.index', compact('data'));
         }
-        
-        return view('main.profile.mix.index', compact('data'));
     }
 
     /**
@@ -115,6 +147,104 @@ class ProfileController extends Controller
                 $user->address()->update($userAddress);
             }
         } catch (\Exception $e) {
+            return response()->json(['failed' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => 'Data berhasil diubah!']);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\ParentsProfileRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateParents(ParentsProfileRequest $request, User $user)
+    {
+        $father = $user->student->families()->where('type', 'Father')->first();
+        $mother = $user->student->families()->where('type', 'Mother')->first();
+
+        try {
+            DB::beginTransaction();
+            
+            $userFather = [
+                'type' => $request->father['type'],
+                'name' => $request->father['name'],
+                'occupation' => $request->father['occupation']
+            ];
+
+            $userMother = [
+                'type' => $request->mother['type'],
+                'name' => $request->mother['name'],
+                'occupation' => $request->mother['occupation']
+            ];
+
+            $fatherAddress = [
+                'address' => $request->father['address'],
+                'phone' => $request->father['phone']
+            ];
+
+            if (!$father) {
+                $fatherCreated = $user->student->families()->create($userFather);
+                $fatherCreated->address()->create($fatherAddress);
+            } else {
+                $father->update($userFather);
+                $father->address()->update($fatherAddress);
+            }
+
+            if (!$mother) {
+                $user->student->families()->create($userMother);
+            } else {
+                $mother->update($userMother);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json(['failed' => $e->getMessage()]);
+        }
+
+        return response()->json(['ok' => 'Data berhasil diubah!']);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\GuardianProfileRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateGuardian(GuardianProfileRequest $request, User $user)
+    {
+        $guardian = $user->student->families()->where('type', 'Guardian')->first();
+
+        try {
+            DB::beginTransaction();
+            
+            $userGuardian = [
+                'type' => $request->guardian['type'],
+                'name' => $request->guardian['name'],
+                'occupation' => $request->guardian['occupation']
+            ];
+            $guardianAddress = [
+                'address' => $request->guardian['address'],
+                'phone' => $request->guardian['phone']
+            ];
+
+            if (!$guardian) {
+                $guardianCreated = $user->student->families()->create($userGuardian);
+                $guardianCreated->address()->create($guardianAddress);
+            } else {
+                $guardian->update($userGuardian);
+                $guardian->address()->update($guardianAddress);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
             return response()->json(['failed' => $e->getMessage()]);
         }
 

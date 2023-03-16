@@ -182,9 +182,33 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        $data = [
+        $fatherIdentity = $student->families()->where('type', 'Father')->first();
+        $fatherAddress = $fatherIdentity ? $fatherIdentity->address()->first() : null;
+        $motherIdentity = $student->families()->where('type', 'Mother')->first();
+        $guardianIdentity = $student->families()->where('type', 'Guardian')->first();
+        $guardianAddress = $guardianIdentity ? $guardianIdentity->address()->first() : null;
+        $father = [
+            'name' => $fatherIdentity->name ?? '',
+            'occupation' => $fatherIdentity->occupation ?? '',
+            'address' => $fatherAddress->address ?? '',
+            'phone' => $fatherAddress->phone ?? ''
+        ];
+        $mother = [
+            'name' => $motherIdentity->name ?? '',
+            'occupation' => $motherIdentity->occupation ?? ''
+        ];
+        $guardian = [
+            'name' => $guardianIdentity->name ?? '',
+            'occupation' => $guardianIdentity->occupation ?? '',
+            'address' => $guardianAddress->address ?? '',
+            'phone' => $guardianAddress->phone ?? ''
+        ];
+        $data= [
             'title' => 'Edit Siswa',
-            'student' => $student
+            'student' => $student,
+            'father' => $father,
+            'mother' => $mother,
+            'guardian' => $guardian
         ];
 
         return view('main.data.student.edit', compact('data'));
@@ -199,15 +223,9 @@ class StudentController extends Controller
      */
     public function update(StudentUpdateRequest $request, Student $student)
     {
-        $families = collect([]);
-        $father = collect($request->father);
-        $mother = collect($request->mother);
-        $guardian = collect($request->guardian);
-        if ($request->guardian['name'] && $request->guardian['occupation'] && $request->guardian['address'] && $request->guardian['phone']) {
-            $families->push($father, $mother, $guardian);
-        } else {
-            $families->push($father, $mother);
-        }
+        $father = $student->families()->where('type', 'Father')->first();
+        $mother = $student->families()->where('type', 'Mother')->first();
+        $guardian = $student->families()->where('type', 'Guardian')->first();
 
         try {
             DB::beginTransaction();
@@ -216,7 +234,6 @@ class StudentController extends Controller
                 'name' => $request->name,
                 'username' => $request->nisn,
             ]);
-
             $student->update([
                 'nis' => $request->nis,
                 'nisn' => $request->nisn,
@@ -244,7 +261,6 @@ class StudentController extends Controller
                 'religion' => $request->religion,
                 'profile_picture' => $profile_picture ?? $student->user->user_detail->profile_picture ?? null
             ];
-
             $userAddress = [
                 'address' => $request->address,
                 'email' => $request->email,
@@ -263,69 +279,50 @@ class StudentController extends Controller
                 $student->user->address()->update($userAddress);
             }
 
-            $familiesUpdate = $student->families()->get();
-            
             $userFather = [
                 'type' => $request->father['type'],
                 'name' => $request->father['name'],
                 'occupation' => $request->father['occupation']
             ];
-
             $userMother = [
                 'type' => $request->mother['type'],
                 'name' => $request->mother['name'],
                 'occupation' => $request->mother['occupation']
             ];
-
             $userGuardian = [
                 'type' => $request->guardian['type'],
                 'name' => $request->guardian['name'],
                 'occupation' => $request->guardian['occupation']
             ];
-
             $fatherAddress = [
                 'address' => $request->father['address'],
                 'phone' => $request->father['phone']
             ];
-
             $guardianAddress = [
                 'address' => $request->guardian['address'],
                 'phone' => $request->guardian['phone']
             ];
 
-            if ($familiesUpdate->count() === 0) {
-                $familiesCreate = [];
+            if (!$father) {
+                $fatherCreated = $student->families()->create($userFather);
+                $fatherCreated->address()->create($fatherAddress);
+            } else {
+                $father->update($userFather);
+                $father->address()->update($fatherAddress);
+            }
 
-                foreach ($families as $index => $family) {
-                    $familiesCreate[$index] = [
-                        'type' => $family['type'],
-                        'name' => $family['name'],
-                        'occupation' => $family['occupation']
-                    ];
-                }
+            if (!$mother) {
+                $student->families()->create($userMother);
+            } else {
+                $mother->update($userMother);
+            }
 
-                $familiesCreated = $student->families()->createMany($familiesCreate);
-                $familiesCreated[0]->address()->create($fatherAddress);
-
-                if ($familiesCreated->count() === 3) {
-                    $familiesCreated[2]->address()->create($guardianAddress);
-                }
-            } else if ($familiesUpdate->count() === 3 && $families->count() === 3) {
-                $familiesUpdate[0]->update($userFather);
-                $familiesUpdate[1]->update($userMother);
-                $familiesUpdate[2]->update($userGuardian);
-                $familiesUpdate[0]->address()->update($fatherAddress);
-                $familiesUpdate[2]->address()->update($guardianAddress);
-            } else if ($familiesUpdate->count() === 2 && $families->count() === 3) {
-                $familiesUpdate[0]->update($userFather);
-                $familiesUpdate[1]->update($userMother);
-                $familiesCreated = $student->families()->create($userGuardian);
-                $familiesUpdate[0]->address()->update($fatherAddress);
-                $familiesCreated->address()->create($guardianAddress);
-            } else if ($familiesUpdate->count() === 2 && $families->count() === 2) {
-                $familiesUpdate[0]->update($userFather);
-                $familiesUpdate[1]->update($userMother);
-                $familiesUpdate[0]->address()->update($fatherAddress);
+            if (!$guardian) {
+                $guardianCreated = $student->families()->create($userGuardian);
+                $guardianCreated->address()->create($guardianAddress);
+            } else {
+                $guardian->update($userGuardian);
+                $guardian->address()->update($guardianAddress);
             }
 
             DB::commit();

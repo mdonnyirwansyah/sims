@@ -260,7 +260,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_name" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.name') is-invalid @enderror" id="father_name" name="father[name]" value="{{ old('father.name') ?? $data['student']->families[0]->name ?? '' }}">
+                                            <input type="text" class="form-control @error('father.name') is-invalid @enderror" id="father_name" name="father[name]" value="{{ old('father.name') ?? $data['father']['name'] ?? '' }}">
                                             @error('father.name')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -272,7 +272,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="mother_name" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('mother.name') is-invalid @enderror" id="mother_name" name="mother[name]" value="{{ old('mother.name') ?? $data['student']->families[1]->name ?? '' }}">
+                                            <input type="text" class="form-control @error('mother.name') is-invalid @enderror" id="mother_name" name="mother[name]" value="{{ old('mother.name') ?? $data['mother']['name'] ?? '' }}">
                                             @error('mother.name')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -289,7 +289,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_occupation" class="col-sm-3 col-form-label">Ayah <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.occupation') is-invalid @enderror" id="father_occupation" name="father[occupation]" value="{{ old('father.occupation') ?? $data['student']->families[0]->occupation ?? '' }}">
+                                            <input type="text" class="form-control @error('father.occupation') is-invalid @enderror" id="father_occupation" name="father[occupation]" value="{{ old('father.occupation') ?? $data['father']['occupation'] ?? '' }}">
                                             @error('father.occupation')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -300,7 +300,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="mother_occupation" class="col-sm-3 col-form-label">Ibu <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('mother.occupation') is-invalid @enderror" id="mother_occupation" name="mother[occupation]" value="{{ old('mother.occupation') ?? $data['student']->families[1]->occupation ?? '' }}">
+                                            <input type="text" class="form-control @error('mother.occupation') is-invalid @enderror" id="mother_occupation" name="mother[occupation]" value="{{ old('mother.occupation') ?? $data['mother']['occupation'] ?? '' }}">
                                             @error('mother.occupation')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -317,7 +317,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_address" class="col-sm-3 col-form-label">Alamat <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('father.address') is-invalid @enderror" id="father_address" name="father[address]">{{ old('father.address') ?? $data['student']->families[0]->address->address ?? '' }}</textarea>
+                                            <textarea class="form-control @error('father.address') is-invalid @enderror" id="father_address" name="father[address]">{{ old('father.address') ?? $data['father']['address'] ?? '' }}</textarea>
                                             @error('father.address')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -328,7 +328,7 @@ $(document).ready(function() {
                                     <div class="form-group row">
                                         <label for="father_phone" class="col-sm-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('father.phone') is-invalid @enderror" id="father_phone" name="father[phone]" value="{{ old('father.phone') ?? $data['student']->families[0]->address->phone ?? '' }}">
+                                            <input type="text" class="form-control @error('father.phone') is-invalid @enderror" id="father_phone" name="father[phone]" value="{{ old('father.phone') ?? $data['father']['phone'] ?? '' }}">
                                             @error('father.phone')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -344,9 +344,9 @@ $(document).ready(function() {
                                     <hr>
                                     <input type="hidden" name="guardian[type]" value="Guardian">
                                     <div class="form-group row">
-                                        <label for="guardian_name" class="col-sm-3 col-form-label">Name {!! $data['student']->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_name" class="col-sm-3 col-form-label">Name {!! $data['guardian']['name'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') ?? $data['student']->families[2]->name ?? '' }}">
+                                            <input type="text" class="form-control @error('guardian.name') is-invalid @enderror" id="guardian_name" name="guardian[name]" value="{{ old('guardian.name') ?? $data['guardian']['name'] ?? '' }}">
                                             @error('guardian.name')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -355,9 +355,9 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan {!! $data['student']->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_occupation" class="col-sm-3 col-form-label">Pekerjaan {!! $data['guardian']['occupation'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.occupation') is-invalid @enderror" id="guardian_occupation" name="guardian[occupation]" value="{{ old('guardian.occupation') ?? $data['student']->families[2]->occupation ?? '' }}">
+                                            <input type="text" class="form-control @error('guardian.occupation') is-invalid @enderror" id="guardian_occupation" name="guardian[occupation]" value="{{ old('guardian.occupation') ?? $data['guardian']['occupation'] ?? '' }}">
                                             @error('guardian.occupation')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -366,9 +366,9 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat {!! $data['student']->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_address" class="col-sm-3 col-form-label">Alamat {!! $data['guardian']['address'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control @error('guardian.address') is-invalid @enderror" id="guardian_address" name="guardian[address]">{{ old('guardian.address') ?? $data['student']->families[2]->address->address ?? '' }}</textarea>
+                                            <textarea class="form-control @error('guardian.address') is-invalid @enderror" id="guardian_address" name="guardian[address]">{{ old('guardian.address') ?? $data['guardian']['address'] ?? '' }}</textarea>
                                             @error('guardian.address')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>
@@ -377,9 +377,9 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP {!! $data['student']->families()->count() === 3 ? '<span class="text-danger">*</span>' : null !!}</label>
+                                        <label for="guardian_phone" class="col-sm-3 col-form-label">No. HP {!! $data['guardian']['phone'] ? '<span class="text-danger">*</span>' : null !!}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control @error('guardian.phone') is-invalid @enderror" id="guardian_phone" name="guardian[phone]" value="{{ old('guardian.phone') ?? $data['student']->families[2]->address->phone ?? '' }}">
+                                            <input type="text" class="form-control @error('guardian.phone') is-invalid @enderror" id="guardian_phone" name="guardian[phone]" value="{{ old('guardian.phone') ?? $data['guardian']['phone'] ?? '' }}">
                                             @error('guardian.phone')
                                             <span class="invalid-feedback" role="alert">
                                                 <small>{{ $message }}</small>

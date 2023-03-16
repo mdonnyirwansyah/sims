@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
         Route::put('{user}', 'update')->name('update');
         Route::put('address/{user}', 'updateAddress')->name('update-address');
         Route::put('account/{user}', 'updateAccount')->name('update-account');
+        Route::put('parents/{user}', 'updateParents')->name('update-parents');
+        Route::put('guardian/{user}', 'updateGuardian')->name('update-guardian');
     });
         Route::prefix('data')->name('data.')->group(function () {
             Route::prefix('student')->name('student.')->controller(StudentController::class)->group(function () {
