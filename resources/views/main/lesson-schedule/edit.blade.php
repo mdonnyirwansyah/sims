@@ -64,7 +64,7 @@ $(document).ready(function() {
                             <div class="form-group row">
                                 <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran</label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" nama="school_year_id">
+                                    <select class="form-control select2 @error('school_year_id') is-invalid @enderror" id="school_year_id" name="school_year_id">
                                         <option disabled>Pilih Tahun Pelajaran</option>
                                         @foreach ($data['schoolYears'] as $schoolYear)
                                             <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>

@@ -316,11 +316,11 @@ class StudentController extends Controller
             } else {
                 $mother->update($userMother);
             }
-
-            if (!$guardian) {
+            
+            if (!$guardian && $request->guardian['name'] && $request->guardian['occupation'] && $request->guardian['address'] && $request->guardian['phone']) {
                 $guardianCreated = $student->families()->create($userGuardian);
                 $guardianCreated->address()->create($guardianAddress);
-            } else {
+            } else if ($guardian) {
                 $guardian->update($userGuardian);
                 $guardian->address()->update($guardianAddress);
             }
