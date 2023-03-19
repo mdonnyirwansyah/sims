@@ -48,7 +48,7 @@ $(document).ready(function() {
             type: 'post',
             data: function (d) {
                 d.school_year_id = $('#school_year_id').val();
-                d.teacher_id = $('#class_room_id').val();
+                d.class_room_id = $('#class_room_id').val();
                 d.semester = $('#semester').val();
             },
             headers: {

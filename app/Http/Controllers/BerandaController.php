@@ -40,7 +40,7 @@ class BerandaController extends Controller
                     $studentTotal = 0;
                 }
             } else {
-                $classRooms = ClassRoom::all();
+                $classRooms = ClassRoom::whereRelation('school_year', 'status', '1')->get();
                 $classRoomTotal = $classRooms->count();
                 $studentClassRooms = collect($classRooms)->map(function ($item) {
                     return $item->id;

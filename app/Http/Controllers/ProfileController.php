@@ -262,7 +262,7 @@ class ProfileController extends Controller
     {
         try {
             $user->forceFill([
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->new_password),
             ])->save();
         } catch (\Exception $e) {
             return response()->json(['failed' => $e->getMessage()]);
