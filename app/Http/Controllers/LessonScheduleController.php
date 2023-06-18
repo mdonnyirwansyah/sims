@@ -39,7 +39,7 @@ class LessonScheduleController extends Controller
      */
     public function getData(Request $request)
     {
-        if ($request->school_year_id || $request->class_room_id || $request->semester) {
+        if ($request->school_year_id && $request->class_room_id && $request->semester) {
             $lessonSchedules = LessonSchedule::where('school_year_id', $request->school_year_id)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->orderBy('day_id', 'ASC')->get();
         } else {
             $lessonSchedules = LessonSchedule::whereRelation('school_year', 'status', '1')->orderBy('day_id', 'ASC')->get();
@@ -92,7 +92,7 @@ class LessonScheduleController extends Controller
         }])->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
         $days = Day::orderBy('id', 'ASC')->get();
-        
+
         $data = [
             'title' => 'Tambah Jadwal Pelajaran',
             'schoolYears' => $schoolYears,
@@ -145,7 +145,7 @@ class LessonScheduleController extends Controller
         $classRooms = ClassRoom::orderBy('name', 'DESC')->get();
         $subjects = Subjects::orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
         $days = Day::orderBy('id', 'ASC')->get();
-        
+
         $data = [
             'title' => 'Edit Jadwal Pelajaran',
             'lessonSchedule' => $lessonSchedule,

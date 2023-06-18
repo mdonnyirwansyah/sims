@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\ClassRoomController;
 use App\Http\Controllers\GradeController;
@@ -95,14 +96,21 @@ Route::middleware('auth')->group(function () {
             Route::put('{lesson_schedule}', 'update')->name('update');
             Route::delete('{lesson_schedule}', 'destroy')->name('destroy');
         });
-    Route::prefix('grade')->name('grade.')->middleware('auth.is.administrator.or.teacher')->controller(GradeController::class)->group(function () {
-        Route::get('', 'index')->name('index');
-        Route::post('get-data', 'getData')->name('getData');
-        Route::get('create', 'create')->name('create');
-        Route::post('', 'store')->name('store');
-        Route::get('edit/{report}', 'edit')->name('edit');
-        Route::put('{report}', 'update')->name('update');
-        Route::delete('{report}', 'destroy')->name('destroy');
+    Route::prefix('grade')->name('grade.')->middleware('auth.is.administrator.or.teacher')->group(function () {
+        Route::prefix('input')->name('input.')->controller(GradeController::class)->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::post('get-data', 'getData')->name('getData');
+            Route::get('create', 'create')->name('create');
+            Route::post('', 'store')->name('store');
+            Route::get('edit/{report}', 'edit')->name('edit');
+            Route::put('{report}', 'update')->name('update');
+            Route::delete('{report}', 'destroy')->name('destroy');
+        });
+        Route::prefix('archive')->name('archive.')->controller(ArchiveController::class)->group(function () {
+            Route::get('', 'index')->name('index');
+            Route::post('get-data', 'getData')->name('getData');
+            Route::get('show/{lessonSchedule}', 'show')->name('show');
+        });
     });
     Route::prefix('report')->name('report.')->controller(ReportController::class)->group(function () {
         Route::get('', 'index')->name('index');

@@ -6,6 +6,8 @@
 <!-- Select2 -->
 <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
 <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<!-- Sweetaler2 -->
+<link rel="stylesheet" href="{{ asset('plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
 <!-- DataTables -->
 <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
@@ -15,6 +17,8 @@
 @push('javascript')
 <!-- Select2 -->
 <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+<!-- Sweetaler2 -->
+<script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <!-- DataTables -->
 <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
@@ -25,12 +29,10 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
     $('#filter').change(function (e) {
-        if ($('#school_year_id').val() && $('#class_room_id').val() && $('#semester').val()) {
-            reports.draw();
-        }
+        archives.draw();
         e.preventDefault();
     });
-    var reports = $('#reports-table').DataTable({
+    var archives = $('#archives-table').DataTable({
         processing: true,
         serverSide: true,
         paging: true,
@@ -42,12 +44,10 @@ $(document).ready(function() {
         responsive: true,
         rowReorder: true,
         ajax: {
-            url: '{{ route('report.getData') }}',
+            url: '{{ route('grade.archive.getData') }}',
             type: 'post',
             data: function (d) {
                 d.school_year_id = $('#school_year_id').val();
-                d.class_room_id = $('#class_room_id').val();
-                d.semester = $('#semester').val();
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -62,55 +62,18 @@ $(document).ready(function() {
             },
             {data: 'school_year', name: 'school_year'},
             {data: 'class_room', name: 'class_room'},
+            {data: 'subjects', name: 'subjects'},
             {data: 'semester', name: 'semester'},
-            {data: 'student', name: 'student'},
             {
                 data: 'action',
                 name: 'action',
-                width: 35,
+                width: 75,
                 orderable: false,
                 searchable: false
             }
         ]
     });
-
-    $('#school_year_id').change(function () {
-        $('#class_room_id').val(null).trigger('change');
-        handleClassRooms();
-        $('#class_room_id').prop('disabled', false);
-        $('#semester').prop('disabled', false);
-    });
 });
-</script>
-
-<script>
-function handleClassRooms() {
-    $('#class_room_id').select2({
-        placeholder: 'Pilih Kelas',
-        theme: 'bootstrap4',
-        ajax: {
-            url: '{{ route('data.class-room.show-by-school-year') }}',
-            type: 'get',
-            data: function (params) {
-                var query = {
-                    school_year_id: $('#school_year_id').val()
-                }
-                return query;
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                return {
-                    results: $.map(data, function (item) {
-                        return {
-                            text: item.name,
-                            id: item.id
-                        }
-                    })
-                };
-            }
-        }
-    });
-}
 </script>
 @endpush
 
@@ -120,16 +83,17 @@ function handleClassRooms() {
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>{{ $data['title'] }}</h1>
+                <h1>{{ $data["title"] }}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item active">{{ $data['title'] }}</li>
+                    <li class="breadcrumb-item active"> {{ $data["title"] }}</li>
                 </ol>
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 </section>
 
 <!-- Main content -->
@@ -151,26 +115,18 @@ function handleClassRooms() {
                                         <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
                                     @endforeach
                                 </select>
-                                <select class="form-control select2 @error('class_room_id') is-invalid @enderror" id="class_room_id" name="class_room_id" disabled>
-                                    <option selected disabled>Pilih Kelas</option>
-                                </select>
-                                <select class="form-control select2 @error('semester') is-invalid @enderror"  id="semester" name="semester" disabled>
-                                    <option selected disabled>Pilih Semester</option>
-                                    <option value="1 (satu)">1 (satu)</option>
-                                    <option value="2 (dua)">2 (dua)</option>
-                                </select>
                             </div>
                         </form>
                     </div>
                     <div class="card-body">
-                        <table id="reports-table" class="table table-bordered table-striped" style="width:100%">
+                        <table id="archives-table" class="table table-bordered table-striped" style="width:100%">
                             <thead>
                                 <tr>
                                     <th style="width: 10px">No</th>
                                     <th>Tahun Pelajaran</th>
                                     <th>Kelas</th>
+                                    <th>Mata Pelajaran</th>
                                     <th>Semester</th>
-                                    <th>Siswa</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -186,7 +142,8 @@ function handleClassRooms() {
             <!-- /.col -->
         </div>
         <!-- /.row -->
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 </section>
 <!-- /.content -->
 @endsection

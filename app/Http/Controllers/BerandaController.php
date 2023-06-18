@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassRoom;
+use App\Models\LessonSchedule;
 use App\Models\Teacher;
 use App\Models\SchoolYear;
 use App\Models\Student;
@@ -47,7 +48,7 @@ class BerandaController extends Controller
                 });
                 $studentTotal = DB::table('class_room_student')->whereIn('class_room_id', $studentClassRooms)->get()->count();
             }
-            
+
             $data = [
                 'title' => 'Beranda',
                 'schoolYears' => $schoolYears,
@@ -56,50 +57,54 @@ class BerandaController extends Controller
                 'students' => $studentTotal,
                 'subjects' => $subjects
             ];
-            
+
             return view('main.beranda.administrator.index', compact('data'));
         }
 
         $lessonSchedules = [];
 
-        if ($user->role->name === 'Student') {
-            $classRoom = $user->student->class_rooms()->whereRelation('school_year', 'status', '1')->first();
-            
-            if ($classRoom && $classRoom->lesson_schedules()->count() > 0) {
-                $days = $classRoom->lesson_schedules()->whereRelation('school_year', 'status', '1')->groupBy('day_id')->get();
+        if ($request->semester) {
+            if ($user->role->name === 'Student') {
+                $classRoom = $user->student->class_rooms()->whereRelation('school_year', 'status', '1')->first();
 
-                foreach ($days as $index => $day) {
-                    $schedules = $classRoom->lesson_schedules()->where('day_id', $day->day_id)->whereRelation('school_year', 'status', '1')->get()->map(function ($lessonSchedule) {
-                        $data = [
-                            'subjects' => $lessonSchedule->subjects->name,
-                            'time' => Carbon::createFromFormat('H:i:s', $lessonSchedule->start_time)->format('H:i') .' - '. Carbon::createFromFormat('H:i:s', $lessonSchedule->end_time)->format('H:i')
-                        ];
-                        return $data;
-                    });
+                if ($classRoom && $classRoom->lesson_schedules()->count() > 0) {
+                    $days = LessonSchedule::where('class_room_id', $classRoom->id)->where('semester', $request->semester)->whereRelation('school_year', 'status', '1')->groupBy('day_id')->get();
 
-                    $lessonSchedules[$index] = [
-                        'day' => $day->day->name,
+                    foreach ($days as $index => $day) {
+                        $schedules = LessonSchedule::where('class_room_id', $classRoom->id)->where('semester', $request->semester)->where('day_id', $day->day_id)->whereRelation('school_year', 'status', '1')->get()->map(function ($lessonSchedule) {
+                            $data = [
+                                'subjects' => $lessonSchedule->subjects->name,
+                                'classroom' => $lessonSchedule->class_room->name,
+                                'time' => Carbon::createFromFormat('H:i:s', $lessonSchedule->start_time)->format('H:i') .' - '. Carbon::createFromFormat('H:i:s', $lessonSchedule->end_time)->format('H:i')
+                            ];
+                            return $data;
+                        });
+
+                        $lessonSchedules[$index] = [
+                            'day' => $day->day->name,
                             'schedules' => $schedules
-                    ];
+                        ];
+                    }
                 }
-            }
-        } else if ($user->role->name === 'Teacher') {
-            if ($user->teacher->lesson_schedules()->count() > 0) {
-                $days = $user->teacher->lesson_schedules()->whereRelation('school_year', 'status', '1')->groupBy('day_id')->get();
+            } elseif ($user->role->name === 'Teacher') {
+                if ($user->teacher->lesson_schedules()->count() > 0) {
+                    $days = LessonSchedule::where('teacher_id', $user->teacher->id)->where('semester', $request->semester)->whereRelation('school_year', 'status', '1')->groupBy('day_id')->get();
 
-                foreach ($days as $index => $day) {
-                    $schedules = $user->teacher->lesson_schedules()->where('day_id', $day->day_id)->whereRelation('school_year', 'status', '1')->get()->map(function ($lessonSchedule) {
-                        $data = [
-                            'subjects' => $lessonSchedule->subjects->name,
-                            'time' => Carbon::createFromFormat('H:i:s', $lessonSchedule->start_time)->format('H:i') .' - '. Carbon::createFromFormat('H:i:s', $lessonSchedule->end_time)->format('H:i')
-                        ];
-                        return $data;
-                    });
+                    foreach ($days as $index => $day) {
+                        $schedules = LessonSchedule::where('teacher_id', $user->teacher->id)->where('semester', $request->semester)->where('day_id', $day->day_id)->whereRelation('school_year', 'status', '1')->get()->map(function ($lessonSchedule) {
+                            $data = [
+                                'subjects' => $lessonSchedule->subjects->name,
+                                'classroom' => $lessonSchedule->class_room->name,
+                                'time' => Carbon::createFromFormat('H:i:s', $lessonSchedule->start_time)->format('H:i') .' - '. Carbon::createFromFormat('H:i:s', $lessonSchedule->end_time)->format('H:i')
+                            ];
+                            return $data;
+                        });
 
-                    $lessonSchedules[$index] = [
-                        'day' => $day->day->name,
+                        $lessonSchedules[$index] = [
+                            'day' => $day->day->name,
                             'schedules' => $schedules
-                    ];
+                        ];
+                    }
                 }
             }
         }
@@ -111,4 +116,6 @@ class BerandaController extends Controller
 
         return view('main.beranda.mix.index', compact('data'));
     }
+
+
 }

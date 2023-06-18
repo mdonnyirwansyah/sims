@@ -10,7 +10,7 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img @if (Auth::user()->user_detail()->count() > 0) src="{!! Auth::user()->user_detail->profile_picture ? asset('storage/profile-pictures/'.  Auth::user()->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" @else src="{{ asset('dist/img/profile-picture.png') }}" @endif  class="img-circle elevation-2" alt="User profile picture">
+                <img @if (Auth::user()->user_detail()->count() > 0) src="{!! Auth::user()->user_detail->profile_picture ? asset('storage/profile-pictures/'. Auth::user()->user_detail->profile_picture) : asset('dist/img/profile-picture.png') !!}" @else src="{{ asset('dist/img/profile-picture.png') }}" @endif class="img-circle elevation-2" alt="User profile picture">
             </div>
             <div class="info">
                 <a href="{{ route('profile.index') }}" class="d-block">{{ Auth::user()->name }}</a>
@@ -84,11 +84,30 @@
                 </li>
                 @endcan
                 @can('is-administrator-or-teacher', Auth::user())
-                <li class="nav-item">
-                    <a href="{{ route('grade.index') }}" class="nav-link {{ request()->routeIs('grade.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-check-square"></i>
-                        <p>Penilaian</p>
+                <li class="nav-item {{ request()->routeIs('grade.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('grade.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas  fa-check-square"></i>
+                        <p>
+                            Penilaian
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('grade.input.index') }}" class="nav-link {{ request()->routeIs('grade.input.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Input Nilai</p>
+                            </a>
+                        </li>
+                        @can('is-teacher', Auth::user())
+                        <li class="nav-item">
+                            <a href="{{ route('grade.archive.index') }}" class="nav-link {{ request()->routeIs('grade.archive.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Rekap Nilai</p>
+                            </a>
+                        </li>
+                        @endcan
+                    </ul>
                 </li>
                 @endcan
                 <li class="nav-item">

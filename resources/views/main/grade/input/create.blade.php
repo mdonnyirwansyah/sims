@@ -50,7 +50,7 @@ $(document).ready(function() {
                     async function redirect() {
                         let promise = new Promise(function (resolve, reject) {
                             setTimeout(function () {
-                                resolve('{{ route("grade.index") }}'); 
+                                resolve('{{ route("grade.input.index") }}');
                             }, 3000);
                         });
                         window.location.href = await promise;
@@ -147,10 +147,10 @@ function handleSubjects() {
                 $.each(response, function (key, value) {
                     $('#subjects').append(`<div class="form-group row"><label for="subjects" class="col-sm-3 col-form-label">${value.name} <span class="text-danger">*</span></label><input type="hidden" name="subjects[${value.id}][subjects_id]" value="${value.id}"><div class="col-sm-9"><input type="number" class="form-control" id="subjects_${key}_value" name="subjects[${value.id}][value]" placeholder="Nilai"><small class="invalid-feedback subjects_${key}_value_err"></small></div></div><div class="form-group row"><label class="col-sm-3 col-form-label"></label><div class="col-sm-9"><textarea id="subjects_${key}_description" class="form-control" id="subjects_${key}_description" name="subjects[${value.id}][description]" placeholder="Keterangan"></textarea><small class="invalid-feedback subjects_${key}_description_err"></small></div></div>`);
                 });
-            } 
+            }
             if (response.length === 0) {
                 $('#subjects').empty();
-            } 
+            }
             if (!response.length > 0 && !response.length === 0) {
                 toastr.error('Something when wrong...', 'Pemberitahuan,');
             }
@@ -185,7 +185,7 @@ function printErrorMsg (msg) {
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('grade.index') }}">Penilaian</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('grade.input.index') }}">Penilaian</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
@@ -205,7 +205,7 @@ function printErrorMsg (msg) {
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <form id="form-action" class="form-horizontal" action="{{ route('grade.store') }}" enctype="multipart/form-data">
+                        <form id="form-action" class="form-horizontal" action="{{ route('grade.input.store') }}" enctype="multipart/form-data">
                             <div class="form-group row">
                                 <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
@@ -262,7 +262,7 @@ function printErrorMsg (msg) {
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <a href="{{ route('grade.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
+                                    <a href="{{ route('grade.input.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
                                     <button id="submit-button" type="submit" class="btn btn-primary float-right">Submit</button>
                                 </div>
                             </div>

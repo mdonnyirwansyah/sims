@@ -24,7 +24,7 @@ class ReportController extends Controller
 
         if($user->role->name === 'Student') {
             $classRooms = $user->student->class_rooms()->orderBy('class', 'DESC')->get();
-    
+
             $data = [
                 'title' => 'E-Raport',
                 'classRooms' => $classRooms
@@ -39,7 +39,7 @@ class ReportController extends Controller
             'title' => 'E-Raport',
             'schoolYears' => $schoolYears
         ];
-        
+
         return view('main.report.mix.index', compact('data'));
     }
 
@@ -51,15 +51,15 @@ class ReportController extends Controller
     public function getData(Request $request)
     {
         $user = Auth::user();
-        if ($request->school_year_id || $request->semester || $request->class_room_id) {
+        if ($request->school_year_id && $request->semester && $request->class_room_id) {
             if ($user->role->name === 'Teacher') {
-                $reports = Report::whereRelation('class_room', 'teacher_id', $user->teacher->id)->whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
+                $reports = Report::whereRelation('class_room', 'teacher_id', $user->teacher->id)->whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->groupBy('semester')->get();
             } else {
-                $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
+                $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
@@ -126,7 +126,7 @@ class ReportController extends Controller
             'studentData' => $studentData,
             'reports' => $reports
         ];
-        
+
         return view('main.report.mix.show', compact('data'));
     }
 
@@ -154,7 +154,7 @@ class ReportController extends Controller
             'studentData' => $studentData,
             'reports' => $reports
         ];
-        
+
         return view('main.report.student.show', compact('data'));
     }
 

@@ -30,7 +30,7 @@ class GradeController extends Controller
             'schoolYears' => $schoolYears
         ];
 
-        return view('main.grade.index', compact('data'));
+        return view('main.grade.input.index', compact('data'));
     }
 
     /**
@@ -41,7 +41,7 @@ class GradeController extends Controller
     public function getData(Request $request)
     {
         $user = Auth::user();
-        if ($request->school_year_id || $request->semester || $request->class_room_id || $request->type) {
+        if ($request->school_year_id && $request->semester && $request->class_room_id && $request->type) {
             if ($user->role->name === 'Teacher') {
                 $reports = Report::whereRelation('class_room', 'teacher_id', $user->teacher->id)->whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
@@ -73,18 +73,18 @@ class GradeController extends Controller
 
         return DataTables::of($reports)
         ->addIndexColumn()
-        ->editColumn('class_room', function($report) {
+        ->editColumn('class_room', function ($report) {
             return $report->class_room->name;
         })
-        ->editColumn('student', function($report) {
+        ->editColumn('student', function ($report) {
             return $report->student->user->name;
         })
         ->addColumn('action', function ($report) {
             return '
-            <a href="'. route("grade.edit", $report['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
+            <a href="'. route("grade.input.edit", $report['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Edit">
                 <i class="fa fa-pen"></i>
             </a>
-            <button id="'. $report['id']. '" route="'. route("grade.destroy", $report['id']) .'" onclick="handleDelete('. $report['id'] .')" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
+            <button id="'. $report['id']. '" route="'. route("grade.input.destroy", $report['id']) .'" onclick="handleDelete('. $report['id'] .')" type="button" class="btn btn-outline-danger btn-xs ml-1" data-toggle="tooltip" data-placement="top" title="Hapus">
                 <i class="fa fa-trash"></i>
             </button>
             ';
@@ -107,7 +107,7 @@ class GradeController extends Controller
             'schoolYears' => $schoolYears
         ];
 
-        return view('main.grade.create', compact('data'));
+        return view('main.grade.input.create', compact('data'));
     }
 
     /**
@@ -139,7 +139,7 @@ class GradeController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return response()->json(['failed' => $e->getMessage()]);
         }
 
@@ -162,7 +162,7 @@ class GradeController extends Controller
             'schoolYears' => $schoolYears
         ];
 
-        return view('main.grade.edit', compact('data'));
+        return view('main.grade.input.edit', compact('data'));
     }
 
     /**
@@ -175,7 +175,7 @@ class GradeController extends Controller
     public function update(GradeUpdateRequest $request, Report $report)
     {
         $grades = collect($request->subjects);
-        
+
         try {
             foreach ($grades as $grade) {
                 $gradeSelected = Grade::find($grade['id']);
@@ -188,7 +188,7 @@ class GradeController extends Controller
             return redirect()->back()->with('failed', $e->getMessage());
         }
 
-        return redirect()->route('grade.index')->with('ok', 'Data berhasil diubah!');
+        return redirect()->route('grade.input.index')->with('ok', 'Data berhasil diubah!');
     }
 
     /**

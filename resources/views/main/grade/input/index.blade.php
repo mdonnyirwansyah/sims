@@ -29,7 +29,9 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
     $('#filter').change(function (e) {
-        grades.draw();
+        if ($('#school_year_id').val() && $('#class_room_id').val() && $('#semester').val() && $('#type').val()) {
+            grades.draw();
+        }
         e.preventDefault();
     });
     var grades = $('#grades-table').DataTable({
@@ -44,7 +46,7 @@ $(document).ready(function() {
         responsive: true,
         rowReorder: true,
         ajax: {
-            url: '{{ route('grade.getData') }}',
+            url: '{{ route('grade.input.getData') }}',
             type: 'post',
             data: function (d) {
                 d.school_year_id = $('#school_year_id').val();
@@ -137,11 +139,11 @@ function handleDelete(id) {
                     if (response.ok) {
                         $('#grades-table').DataTable().draw();
                         toastr.success(response.ok, 'Pemberitahuan,');
-                    } 
+                    }
                     if (response.failed) {
                         $('#alert').removeClass('d-none');
                         $('#failed').append(response.failed);
-                    } 
+                    }
                     if (!response.ok && !response.failed) {
                         toastr.error('Something when wrong...', 'Pemberitahuan,');
                     }
@@ -221,7 +223,7 @@ function handleDelete(id) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <a href="{{ route('grade.create') }}" class="btn btn-primary float-right">Tambah</a>
+                                <a href="{{ route('grade.input.create') }}" class="btn btn-primary float-right">Tambah</a>
                             </div>
                         </div>
                         <hr>

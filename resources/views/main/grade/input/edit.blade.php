@@ -13,7 +13,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('grade.index') }}">Penilaian</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('grade.input.index') }}">Penilaian</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <form id="form-action" class="form-horizontal" action="{{ route('grade.update', $data['report']->id) }}" method="post" enctype="multipart/form-data">
+                        <form id="form-action" class="form-horizontal" action="{{ route('grade.input.update', $data['report']->id) }}" method="post" enctype="multipart/form-data">
                             @method('put')
                             @csrf
                             <div class="form-group row">
@@ -96,7 +96,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <a href="{{ route('grade.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
+                                    <a href="{{ route('grade.input.index') }}" class="btn btn-danger float-right ml-2">Batal</a>
                                     <button id="submit-button" type="submit" class="btn btn-primary float-right">Simpan</button>
                                 </div>
                             </div>

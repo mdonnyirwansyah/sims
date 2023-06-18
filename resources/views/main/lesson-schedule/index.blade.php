@@ -29,7 +29,9 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
     $('#filter').change(function (e) {
-        lessonSchedules.draw();
+        if ($('#school_year_id').val() && $('#class_room_id').val() && $('#semester').val()) {
+            lessonSchedules.draw();
+        }
         e.preventDefault();
     });
     var lessonSchedules = $('#lesson-schedules-table').DataTable({
@@ -137,11 +139,11 @@ function handleDelete(id) {
                     if (response.ok) {
                         $('#lesson-schedules-table').DataTable().draw();
                         toastr.success(response.ok, 'Pemberitahuan,');
-                    } 
+                    }
                     if (response.failed) {
                         $('#alert').removeClass('d-none');
                         $('#failed').append(response.failed);
-                    } 
+                    }
                     if (!response.ok && !response.failed) {
                         toastr.error('Something when wrong...', 'Pemberitahuan,');
                     }

@@ -38,4 +38,12 @@ class Report extends Model
             $query->orderBy('group', 'ASC');
         }]);
     }
+
+    /**
+     * Get the grade that owns the report.
+     */
+    public function grade()
+    {
+        return $this->hasOne(Grade::class);
+    }
 }
