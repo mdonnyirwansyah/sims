@@ -24,8 +24,9 @@ class GradeUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'subjects.*.value' => 'required',
-            'subjects.*.description' => 'required'
+            'subjects' => 'required|array',
+            'subjects.*.value' => 'nullable|numeric',
+            'subjects.*.description' => 'nullable'
         ];
     }
 

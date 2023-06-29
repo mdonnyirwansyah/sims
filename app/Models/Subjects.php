@@ -12,4 +12,12 @@ class Subjects extends Model
     protected $table = 'subjects';
 
     protected $guarded = [];
+
+    /**
+     * Get the student associated with the user.
+     */
+    public function grade()
+    {
+        return $this->hasOne(Grade::class);
+    }
 }

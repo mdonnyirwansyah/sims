@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\GradeStoreRequest;
-use App\Http\Requests\GradeUpdateRequest;
 use App\Models\Grade;
-use App\Models\ClassRoom;
 use App\Models\Report;
-use App\Models\SchoolYear;
 use App\Models\Student;
+use App\Models\ClassRoom;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LessonSchedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\GradeStoreRequest;
 use Yajra\DataTables\Facades\DataTables;
+use App\Http\Requests\GradeUpdateRequest;
+use App\Http\Requests\GradeSubjectsStoreRequest;
 
 class GradeController extends Controller
 {
@@ -31,6 +33,28 @@ class GradeController extends Controller
         ];
 
         return view('main.grade.input.index', compact('data'));
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getSubjects(Request $request)
+    {
+        $report = Report::with('grades')->where('student_id', $request->student_id)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->where('type', $request->type)->first();
+
+        if ($report) {
+            $subjects = LessonSchedule::with(['subjects', 'subjects.grade' => function ($query) use ($report) {
+                $query->where('report_id', $report->id);
+            }])->where('class_room_id', $request->class_room_id)->where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->get();
+
+            return response()->json($subjects);
+        } else {
+            $subjects = LessonSchedule::with('subjects')->where('class_room_id', $request->class_room_id)->where('school_year_id', $request->school_year_id)->where('semester', $request->semester)->get();
+
+            return response()->json($subjects);
+        }
     }
 
     /**
@@ -98,7 +122,7 @@ class GradeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function createClassroom()
     {
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
 
@@ -107,7 +131,24 @@ class GradeController extends Controller
             'schoolYears' => $schoolYears
         ];
 
-        return view('main.grade.input.create', compact('data'));
+        return view('main.grade.input.create-classroom', compact('data'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createSubjects()
+    {
+        $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
+
+        $data = [
+            'title' => 'Tambah Penilaian',
+            'schoolYears' => $schoolYears
+        ];
+
+        return view('main.grade.input.create-subjects', compact('data'));
     }
 
     /**
@@ -118,23 +159,45 @@ class GradeController extends Controller
      */
     public function store(GradeStoreRequest $request)
     {
-        $exist = Report::where('student_id', $request->student_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->first();
-
-        if ($exist) {
-            return response()->json(['exist' => 'Data sebelumnya sudah ada!']);
-        }
+        $report = Report::where('student_id', $request->student_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('type', $request->type)->first();
 
         try {
             DB::beginTransaction();
 
-            $reportCreated = Report::create([
-                'student_id' => $request->student_id,
-                'semester' => $request->semester,
-                'class_room_id' => $request->class_room_id,
-                'type' => $request->type
-            ]);
+            if ($report) {
+                foreach ($request['subjects'] as $item) {
+                    $grade = Grade::where('report_id', $report->id)->where('subjects_id', $item['subjects_id'])->first();
+                    if ($grade) {
+                        $grade->update([
+                            'value' => $item['value'] ?? $grade->value,
+                            'description' =>  $item['description'] ?? $grade->description
+                        ]);
+                    } else {
+                        Grade::create([
+                            'report_id' => $report->id,
+                            'subjects_id' =>  $item['subjects_id'],
+                            'value' => $item['value'] ?? 0,
+                            'description' =>  $item['description'] ?? '-'
+                        ]);
+                    }
+                }
+            } else {
+                $reportCreated = Report::create([
+                    'student_id' => $request->student_id,
+                    'semester' => $request->semester,
+                    'class_room_id' => $request->class_room_id,
+                    'type' => $request->type
+                ]);
 
-            $reportCreated->grades()->createMany($request->subjects);
+                foreach ($request['subjects'] as $item) {
+                    Grade::create([
+                        'report_id' => $reportCreated->id,
+                        'subjects_id' =>  $item['subjects_id'],
+                        'value' => $item['value'] ?? 0,
+                        'description' =>  $item['description'] ?? '-'
+                    ]);
+                }
+            }
 
             DB::commit();
         } catch (\Exception $e) {
@@ -144,6 +207,62 @@ class GradeController extends Controller
         }
 
         return response()->json(['ok' => 'Data berhasil ditambah!']);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\GradeRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeSubjects(GradeSubjectsStoreRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach ($request['students'] as $item) {
+                $report = Report::where('student_id', $item['id'])->where('semester', $request->semester)->where('class_room_id', trim(explode('|', $request->subjects_id)[0]))->where('type', $request->type)->first();
+
+                if ($report) {
+                    $grade = Grade::where('report_id', $report->id)->where('subjects_id', trim(explode('|', $request->subjects_id)[1]))->first();
+                    if ($grade) {
+                        $grade->update([
+                            'value' => $item['value'] ?? $grade->value,
+                            'description' =>  $item['description'] ?? $grade->description
+                        ]);
+                    } else {
+                        Grade::create([
+                            'report_id' => $report->id,
+                            'subjects_id' =>  explode('|', $request->subjects_id)[1],
+                            'value' => $item['value'] ?? 0,
+                            'description' =>  $item['description'] ?? '-'
+                        ]);
+                    }
+                } else {
+                    $reportCreated = Report::create([
+                        'student_id' => $item['id'],
+                        'semester' => $request->semester,
+                        'class_room_id' => explode('|', $request->subjects_id)[0],
+                        'type' => $request->type
+                    ]);
+
+                    Grade::create([
+                        'report_id' => $reportCreated->id,
+                        'subjects_id' =>  explode('|', $request->subjects_id)[1],
+                        'value' => $item['value'] ?? 0,
+                        'description' =>  $item['description'] ?? '-'
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['ok' => 'Data berhasil ditambah!']);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json(['failed' => $e->getMessage()]);
+        }
     }
 
     /**

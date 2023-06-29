@@ -20,7 +20,7 @@ $(document).ready(function() {
 
     $('#schedule-form').change(function () {
         var form = new FormData(this)
-        window.location.replace(`/?semester=${form.get('semester')}`)
+        window.location.replace(`{{ route('beranda') }}?semester=${form.get('semester')}`)
     })
 });
 </script>

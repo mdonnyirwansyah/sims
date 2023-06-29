@@ -13,7 +13,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ route('beranda') }}">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('grade.archive.index') }}">Penilaian</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('grade.archive.index') }}">Rekap Penilaian</a></li>
                     <li class="breadcrumb-item active">{{ $data['title'] }}</li>
                 </ol>
             </div>
@@ -28,7 +28,27 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <h2 style="font-size: 1.4rem;">Nilai Pengetahuan</h2>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Mata Pelajaran</th>
+                                    <td style="width: 15px;">:</td>
+                                    <td>{{ $data['lesson_schedule']->subjects->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Kelas</th>
+                                    <td style="width: 15px;">:</td>
+                                    <td>{{ $data['lesson_schedule']->class_room->name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Semester</th>
+                                    <td style="width: 15px;">:</td>
+                                    <td>{{ $data['lesson_schedule']->semester }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr>
+                        <h3 style="font-size: 1rem;">Nilai Pengetahuan</h3>
                         <table id="archives-table" class="table table-bordered table-striped" style="width:100%">
                             <thead>
                                 <tr>
@@ -54,7 +74,7 @@
                             </tbody>
                         </table>
                         <br>
-                        <h2 style="font-size: 1.4rem;">Nilai Keterampilan</h2>
+                        <h3 style="font-size: 1rem;">Nilai Keterampilan</h3>
                         <table id="archives-table" class="table table-bordered table-striped" style="width:100%">
                             <thead>
                                 <tr>

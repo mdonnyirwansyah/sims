@@ -81,7 +81,7 @@ class ClassRoomController extends Controller
         $teachers = Teacher::whereRelation('user', 'role_id', 2)->whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
-        
+
         $data = [
             'title' => 'Tambah Kelas',
             'schoolYears' => $schoolYears,
@@ -176,14 +176,12 @@ class ClassRoomController extends Controller
         $teachers = Teacher::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
         }])->get();
-        
         $data = [
             'title' => 'Edit Kelas',
             'classRoom' => $classRoom,
             'schoolYears' => $schoolYears,
             'teachers' => $teachers
         ];
-
 
         return view('main.data.class-room.edit', compact('data'));
     }
@@ -203,7 +201,7 @@ class ClassRoomController extends Controller
         if ($existName || $existTeacher) {
             return redirect()->back()->with('exist', 'Data sebelumnya sudah ada!');
         }
-        
+
         try {
             $classRoom->update([
                 'school_year_id' => $request->school_year_id,
@@ -251,5 +249,27 @@ class ClassRoomController extends Controller
         }
 
         return response()->json($classRooms);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getStudentsByClassroom(Request $request)
+    {
+        $classroom = Classroom::with('students')->find($request->class_room_id);
+        $students = [];
+        foreach ($classroom->students()->get() as $item) {
+            $data = (Object) [
+                'name' => $item->user->name,
+                'id' => $item->id,
+            ];
+
+            array_push($students, $data);
+        }
+
+        return response()->json($students);
     }
 }

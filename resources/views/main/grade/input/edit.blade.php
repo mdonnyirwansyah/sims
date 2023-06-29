@@ -70,10 +70,10 @@
                             <div id="subjects">
                                 @foreach ($data['report']->grades()->get() as $index => $grade)
                                 <div class="form-group row">
-                                    <label for="subjects" class="col-sm-3 col-form-label">{{ $grade->subjects->name }} <span class="text-danger">*</span></label>
+                                    <label for="subjects" class="col-sm-3 col-form-label">{{ $grade->subjects->name }}</label>
                                     <input type="hidden" name="subjects[{{ $index }}][id]" value="{{ $grade->id }}">
                                     <div class="col-sm-9">
-                                        <input type="number" class="form-control @error('subjects.'.$index.'.value') is-invalid @enderror" id="subjects_{{ $grade->subjects->id }}_value" name="subjects[{{ $index }}][value]" value="{{ old('subjects.'.$index.'.value') ?? $grade->value }}">
+                                        <input type="number" class="form-control @error('subjects.'.$index.'.value') is-invalid @enderror" id="subjects_{{ $index }}_value" name="subjects[{{ $index }}][value]" value="{{ old('subjects.'.$index.'.value') ?? $grade->value }}">
                                         @error('subjects.'.$index.'.value')
                                         <span class="invalid-feedback" role="alert">
                                             <small>{{ $message }}</small>
@@ -84,7 +84,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label"></label>
                                     <div class="col-sm-9">
-                                        <textarea id="subjects_{{ $grade->subjects->id }}_description" class="form-control @error('subjects.'.$index.'.description') is-invalid @enderror" id="subjects_{{ $grade->subjects->id }}_description" name="subjects[{{ $index }}][description]">{{ old('subjects.'.$index.'.description') ?? $grade->description }}</textarea>
+                                        <textarea id="subjects_{{ $index }}_description" class="form-control @error('subjects.'.$index.'.description') is-invalid @enderror" id="subjects_{{ $index }}_description" name="subjects[{{ $index }}][description]">{{ old('subjects.'.$index.'.description') ?? $grade->description }}</textarea>
                                         @error('subjects.'.$index.'.description')
                                         <span class="invalid-feedback" role="alert">
                                             <small>{{ $message }}</small>

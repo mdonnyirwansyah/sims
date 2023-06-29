@@ -191,6 +191,7 @@ function handleDelete(id) {
                     <div id="failed"></div>
                 </div>
                 <div class="card">
+                    @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
                     <div class="card-header">
                         <form id="filter">
                             <div class="input-group">
@@ -220,12 +221,26 @@ function handleDelete(id) {
                             </div>
                         </form>
                     </div>
+                    @endif
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <a href="{{ route('grade.input.create') }}" class="btn btn-primary float-right">Tambah</a>
+                                <div class="btn-group float-right" role="group">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                      Tambah
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
+                                            <a class="dropdown-item" href="{{ route('grade.input.create-classroom') }}">Nilai Kelas</a>
+                                        @endif
+                                        @if (Auth::user()->role->name == 'Teacher')
+                                            <a class="dropdown-item" href="{{ route('grade.input.create-subjects') }}">Nilai Mata Pelajaran</a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
                         <hr>
                         <div>
                             <table id="grades-table" class="table table-bordered table-striped" style="width:100%">
@@ -244,6 +259,7 @@ function handleDelete(id) {
                                 </tbody>
                             </table>
                         </div>
+                        @endif
                     </div>
                     <!-- /.card-body -->
                 </div>

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
-class GradeStoreRequest extends FormRequest
+class GradeSubjectsStoreRequest extends FormRequest
 {
     protected function failedValidation(Validator $validator)
     {
@@ -34,12 +34,12 @@ class GradeStoreRequest extends FormRequest
         return [
             'school_year_id' => 'required',
             'semester' => 'required',
-            'class_room_id' => 'required',
             'type' => 'required',
-            'student_id' => 'required',
-            'subjects' => 'required|array',
-            'subjects.*.value' => 'nullable|numeric',
-            'subjects.*.description' => 'nullable'
+            'subjects_id' => 'required',
+            'students' => 'required|array',
+            'students.*.id' => 'nullable',
+            'students.*.value' => 'nullable|numeric',
+            'students.*.description' => 'nullable'
         ];
     }
 

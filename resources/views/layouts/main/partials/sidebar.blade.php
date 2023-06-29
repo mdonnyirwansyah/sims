@@ -110,12 +110,14 @@
                     </ul>
                 </li>
                 @endcan
+                @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
                 <li class="nav-item">
                     <a href="{{ route('report.index') }}" class="nav-link {{ request()->routeIs('report.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file"></i>
                         <p>E-Raport</p>
                     </a>
                 </li>
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

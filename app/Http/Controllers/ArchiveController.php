@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LessonSchedule;
-use App\Models\SchoolYear;
 use App\Models\Report;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LessonSchedule;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class ArchiveController extends Controller
@@ -56,9 +57,17 @@ class ArchiveController extends Controller
         })
         ->addColumn('action', function ($report) {
             return '
-            <a href="'. route("grade.archive.show", $report['id']) .'" class="btn btn-outline-info btn-xs mr-1" data-toggle="tooltip" data-placement="top" title="Lihat">
-                <i class="fa fa-eye"></i>
-            </a>
+            <div style="display: flex; justify-content: center; gap: 5px;">
+                <a href="'. route("grade.archive.show", $report['id']) .'" class="btn btn-outline-success btn-xs" data-toggle="tooltip" data-placement="top" title="Lihat">
+                    <i class="fa fa-eye"></i>
+                </a>
+                <a href="'. route("grade.archive.edit", $report['id']) .'" class="btn btn-outline-info btn-xs" data-toggle="tooltip" data-placement="top" title="Edit">
+                    <i class="fa fa-pen"></i>
+                </a>
+                <a href="'. route("grade.archive.print", $report['id']) .'" target="_blank" class="btn btn-outline-warning btn-xs" data-toggle="tooltip" data-placement="top" title="Cetak">
+                    <i class="fa fa-print"></i>
+                </a>
+            </div>
             ';
         })
         ->rawColumns(['action'])
@@ -78,14 +87,83 @@ class ArchiveController extends Controller
             'keterampilan' => []
         ];
 
-        $report['pengetahuan'] = Report::where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Pengetahuan')->get();
-        $report['keterampilan'] = Report::where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Keterampilan')->get();
+        $report['pengetahuan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Pengetahuan')->get();
+
+        $report['keterampilan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Keterampilan')->get();
 
         $data = [
             'title' => 'Lihat Rekap Penilaian',
             'report' => $report,
+            'lesson_schedule' => $lessonSchedule
         ];
 
         return view('main.grade.archive.show', compact('data'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\LessonSchedule  $lessonSchedule
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(LessonSchedule $lessonSchedule)
+    {
+        $report = [
+            'pengetahuan' => [],
+            'keterampilan' => []
+        ];
+
+        $report['pengetahuan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Pengetahuan')->get();
+        $report['keterampilan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Keterampilan')->get();
+
+        $data = [
+            'title' => 'Edit Rekap Penilaian',
+            'report' => $report,
+            'lesson_schedule' => $lessonSchedule
+        ];
+
+        return view('main.grade.archive.edit', compact('data'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\LessonSchedule  $lessonSchedule
+     * @return \Illuminate\Http\Response
+     */
+    public function print(LessonSchedule $lessonSchedule)
+    {
+        $report = [
+            'pengetahuan' => [],
+            'keterampilan' => []
+        ];
+
+        $report['pengetahuan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Pengetahuan')->get();
+        $report['keterampilan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
+            $query->where('subjects_id', $lessonSchedule->subjects_id);
+        }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Keterampilan')->get();
+
+        $data = [
+            'title' => 'Rekap Penilaian',
+            'report' => $report,
+            'lesson_schedule' => $lessonSchedule
+        ];
+
+        // return view('main.grade.archive.print', compact('data'));
+
+        $pdf = Pdf::loadView('main.grade.archive.print', compact('data'))
+        ->setPaper('a4');
+
+        return $pdf->stream('Rekap-Nilai-' . $lessonSchedule->subjects->name . '-' . $lessonSchedule->class_room->name. '-Tahun-Pelajaran' . $lessonSchedule->school_year->name);
     }
 }

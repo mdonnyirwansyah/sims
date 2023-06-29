@@ -17,17 +17,95 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
     $('#school_year_id').change(function () {
-        $('#class_room_id').val(null).trigger('change');
-        handleClassRooms();
-        $('#semester').prop('disabled', false);
-        $('#class_room_id').prop('disabled', false);
-        $('#type').prop('disabled', false);
+        $('#semester').val(null).change();
+        if ($(this).val().length != 0) {
+            $('#semester').prop('disabled', false);
+        } else {
+            $('#semester').prop('disabled', true);
+        }
+    });
+    $('#semester').change(function () {
+        $('#class_room_id').val(null).change();
+        if ($(this).val().length != 0) {
+            $('#class_room_id').prop('disabled', false);
+        } else {
+            $('#class_room_id').prop('disabled', true);
+        }
     });
     $('#class_room_id').change(function () {
-        $('#student_id').val(null).trigger('change');
-        handleStudents();
-        handleSubjects();
-        $('#student_id').prop('disabled', false);
+        $('#type').val(null).change();
+        if ($(this).val().length != 0) {
+            $('#type').prop('disabled', false);
+        } else {
+            $('#type').prop('disabled', true);
+        }
+    });
+    $('#type').change(function () {
+        $('#student_id').val(null).change();
+        if ($(this).val().length != 0) {
+            $('#student_id').prop('disabled', false);
+        } else {
+            $('#student_id').prop('disabled', true);
+        }
+    });
+    $('#student_id').change(function () {
+        if ($(this).val().length != 0) {
+            handleSubjects();
+        } else {
+            $('#subjects').empty();
+        }
+    });
+    $('#class_room_id').select2({
+        placeholder: 'Pilih Kelas',
+        theme: 'bootstrap4',
+        allowClear: true,
+        ajax: {
+            url: '{{ route('data.class-room.show-by-school-year') }}',
+            type: 'get',
+            data: function (params) {
+                var query = {
+                    school_year_id: $('#school_year_id').val().length == 0 ? '' : $('#school_year_id').val()
+                }
+                return query;
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
+    });
+    $('#student_id').select2({
+        placeholder: 'Pilih Siswa',
+        theme: 'bootstrap4',
+        allowClear: true,
+        ajax: {
+            url: '{{ route('data.student.show-by-class-room') }}',
+            type: 'get',
+            data: function (params) {
+                var query = {
+                    class_room_id: $('#class_room_id').val()
+                }
+                return query;
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.name,
+                            id: item.id
+                        }
+                    })
+                };
+            }
+        }
     });
     $('#form-action').submit(function (e) {
         e.preventDefault();
@@ -79,80 +157,25 @@ $(document).ready(function() {
 </script>
 
 <script>
-function handleClassRooms() {
-    $('#class_room_id').select2({
-        placeholder: 'Pilih Kelas',
-        theme: 'bootstrap4',
-        ajax: {
-            url: '{{ route('data.class-room.show-by-school-year') }}',
-            type: 'get',
-            data: function (params) {
-                var query = {
-                    school_year_id: $('#school_year_id').val()
-                }
-                return query;
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                return {
-                    results: $.map(data, function (item) {
-                        return {
-                            text: item.name,
-                            id: item.id
-                        }
-                    })
-                };
-            }
-        }
-    });
-}
-function handleStudents() {
-    $('#student_id').select2({
-        placeholder: 'Pilih Siswa',
-        theme: 'bootstrap4',
-        ajax: {
-            url: '{{ route('data.student.show-by-class-room') }}',
-            type: 'get',
-            data: function (params) {
-                var query = {
-                    class_room_id: $('#class_room_id').val()
-                }
-                return query;
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                return {
-                    results: $.map(data, function (item) {
-                        return {
-                            text: item.name,
-                            id: item.id
-                        }
-                    })
-                };
-            }
-        }
-    });
-}
 function handleSubjects() {
     $.ajax({
-        url: '{{ route('data.subjects.show-by-class-room') }}',
+        url: '{{ route('grade.input.getSubjects') }}',
         type: 'get',
         data: {
-            'class_room_id' : $('#class_room_id').val()
+            'school_year_id' : $('#school_year_id').val(),
+            'class_room_id' : $('#class_room_id').val(),
+            'student_id' : $('#student_id').val(),
+            'semester' : $('#semester').val(),
+            'type' : $('#type').val()
         },
         dataType: 'json',
         success: function (response) {
+            $('#subjects').empty();
+
             if (response.length > 0) {
-                $('#subjects').empty();
                 $.each(response, function (key, value) {
-                    $('#subjects').append(`<div class="form-group row"><label for="subjects" class="col-sm-3 col-form-label">${value.name} <span class="text-danger">*</span></label><input type="hidden" name="subjects[${value.id}][subjects_id]" value="${value.id}"><div class="col-sm-9"><input type="number" class="form-control" id="subjects_${key}_value" name="subjects[${value.id}][value]" placeholder="Nilai"><small class="invalid-feedback subjects_${key}_value_err"></small></div></div><div class="form-group row"><label class="col-sm-3 col-form-label"></label><div class="col-sm-9"><textarea id="subjects_${key}_description" class="form-control" id="subjects_${key}_description" name="subjects[${value.id}][description]" placeholder="Keterangan"></textarea><small class="invalid-feedback subjects_${key}_description_err"></small></div></div>`);
+                    $('#subjects').append(`<div class="form-group row"><label for="subjects" class="col-sm-3 col-form-label">${value.subjects.name}</label><input type="hidden" name="subjects[${key}][subjects_id]" value="${value.subjects_id}"><div class="col-sm-9"><input type="number" class="form-control" id="subjects_${key}_value" name="subjects[${key}][value]" placeholder="Nilai" value="${value.subjects.grade?.value}"><small class="invalid-feedback subjects_${key}_value_err"></small></div></div><div class="form-group row"><label class="col-sm-3 col-form-label"></label><div class="col-sm-9"><textarea id="subjects_${key}_description" class="form-control" id="subjects_${key}_description" name="subjects[${key}][description]" placeholder="Keterangan">${value.subjects.grade?.description ?? ''}</textarea><small class="invalid-feedback subjects_${key}_description_err"></small></div></div>`);
                 });
-            }
-            if (response.length === 0) {
-                $('#subjects').empty();
-            }
-            if (!response.length > 0 && !response.length === 0) {
-                toastr.error('Something when wrong...', 'Pemberitahuan,');
             }
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -209,8 +232,8 @@ function printErrorMsg (msg) {
                             <div class="form-group row">
                                 <label for="school_year_id" class="col-sm-3 col-form-label">Tahun Pelajaran <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2" id="school_year_id" name="school_year_id">
-                                        <option selected disabled>Pilih Tahun Pelajaran</option>
+                                    <select class="form-control" id="school_year_id" name="school_year_id">
+                                        <option value="">Pilih Tahun Pelajaran</option>
                                         @foreach ($data['schoolYears'] as $schoolYear)
                                             <option value="{{ $schoolYear->id }}">{{ $schoolYear->name }}</option>
                                         @endforeach
@@ -221,8 +244,8 @@ function printErrorMsg (msg) {
                             <div class="form-group row">
                                 <label for="semester" class="col-sm-3 col-form-label">Semester <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2" id="semester" name="semester" disabled>
-                                        <option selected disabled>Pilih Semester</option>
+                                    <select class="form-control" id="semester" name="semester" disabled>
+                                        <option value="">Pilih Semester</option>
                                         <option value="1 (satu)">1 (satu)</option>
                                         <option value="2 (dua)">2 (dua)</option>
                                     </select>
@@ -232,8 +255,8 @@ function printErrorMsg (msg) {
                             <div class="form-group row">
                                 <label for="class_room_id" class="col-sm-3 col-form-label">Kelas <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2" id="class_room_id" name="class_room_id" disabled>
-                                        <option selected disabled>Pilih Kelas</option>
+                                    <select class="form-control" id="class_room_id" name="class_room_id" disabled>
+                                        <option value="">Pilih Kelas</option>
                                     </select>
                                     <small class="invalid-feedback class_room_id_err"></small>
                                 </div>
@@ -241,8 +264,8 @@ function printErrorMsg (msg) {
                             <div class="form-group row">
                                 <label for="type" class="col-sm-3 col-form-label">Jenis <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2" id="type" name="type" disabled>
-                                        <option selected disabled>Pilih Jenis</option>
+                                    <select class="form-control" id="type" name="type" disabled>
+                                        <option value="">Pilih Jenis</option>
                                         <option value="Pengetahuan">Pengetahuan</option>
                                         <option value="Keterampilan">Keterampilan</option>
                                     </select>
@@ -252,8 +275,8 @@ function printErrorMsg (msg) {
                             <div class="form-group row">
                                 <label for="student_id" class="col-sm-3 col-form-label">Siswa <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
-                                    <select class="form-control select2" id="student_id" name="student_id" disabled>
-                                        <option selected disabled>Pilih Siswa</option>
+                                    <select class="form-control" id="student_id" name="student_id" disabled>
+                                        <option value="">Pilih Siswa</option>
                                     </select>
                                     <small class="invalid-feedback student_id_err"></small>
                                 </div>

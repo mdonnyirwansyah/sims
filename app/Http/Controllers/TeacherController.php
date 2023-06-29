@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Teacher;
 use App\Models\User;
-use App\Http\Requests\TeacherStoreRequest;
-use App\Http\Requests\TeacherUpdateRequest;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use App\Models\LessonSchedule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use App\Http\Requests\TeacherStoreRequest;
+use App\Http\Requests\TeacherUpdateRequest;
 
 class TeacherController extends Controller
 {
@@ -66,6 +68,26 @@ class TeacherController extends Controller
         ->make(true);
     }
 
+    /**
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
+    public function getSubjects(Request $request)
+    {
+        $user = Auth::user();
+        $subjects = [];
+        $lessonSchedules = LessonSchedule::where('teacher_id', $user->teacher->id)->where('semester', $request->semester)->whereRelation('school_year', 'school_year_id', $request->school_year_id)->get();
+        foreach ($lessonSchedules as $item) {
+            $data = (Object) [
+                'id' => $item->class_room_id . '|'. $item->subjects_id ,
+                'text' => $item->class_room->name . ' | ' . $item->subjects->name
+            ];
+
+            array_push($subjects, $data);
+        }
+        return response()->json($subjects);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -126,7 +148,7 @@ class TeacherController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return redirect()->back()->with('failed', $e->getMessage());
         }
 
@@ -165,7 +187,7 @@ class TeacherController extends Controller
                 'name' => $request->name,
                 'username' => $request->nip,
             ]);
-            
+
             $teacher->update([
                 'nip' => $request->nip,
                 'education' => $request->education
@@ -197,7 +219,7 @@ class TeacherController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone
             ];
-            
+
             if ($teacher->user->user_detail === null) {
                 $teacher->user->user_detail()->create($userDetail);
             } else {
@@ -213,7 +235,7 @@ class TeacherController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return redirect()->back()->with('failed', $e->getMessage());
         }
 
