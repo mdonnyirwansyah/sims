@@ -13,7 +13,7 @@ $(document).ready(function() {
         var url = $(this).attr('action');
         var formData = new FormData(this);
 
-        store(url, formData);
+        save(url, formData);
     });
     $('#form-action-keterampilan').submit(function (e) {
         e.preventDefault();
