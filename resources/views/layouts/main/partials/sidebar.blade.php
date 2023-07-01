@@ -110,7 +110,7 @@
                     </ul>
                 </li>
                 @endcan
-                @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
+                @if (Auth::user()->teacher?->class_rooms->count() > 0 || Auth::user()->role->name == 'Administrator')
                 <li class="nav-item">
                     <a href="{{ route('report.index') }}" class="nav-link {{ request()->routeIs('report.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file"></i>

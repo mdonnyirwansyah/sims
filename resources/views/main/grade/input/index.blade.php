@@ -191,7 +191,7 @@ function handleDelete(id) {
                     <div id="failed"></div>
                 </div>
                 <div class="card">
-                    @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
+                    @if (Auth::user()->teacher?->class_rooms->count() > 0 || Auth::user()->role->name == 'Administrator')
                     <div class="card-header">
                         <form id="filter">
                             <div class="input-group">
@@ -230,7 +230,7 @@ function handleDelete(id) {
                                       Tambah
                                     </button>
                                     <div class="dropdown-menu">
-                                        @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
+                                        @if (Auth::user()->teacher?->class_rooms->count() > 0 || Auth::user()->role->name == 'Administrator')
                                             <a class="dropdown-item" href="{{ route('grade.input.create-classroom') }}">Nilai Kelas</a>
                                         @endif
                                         @if (Auth::user()->role->name == 'Teacher')
@@ -240,7 +240,7 @@ function handleDelete(id) {
                                 </div>
                             </div>
                         </div>
-                        @if (Auth::user()->teacher?->classroom || Auth::user()->role->name == 'Administrator')
+                        @if (Auth::user()->teacher?->class_rooms->count() > 0 || Auth::user()->role->name == 'Administrator')
                         <hr>
                         <div>
                             <table id="grades-table" class="table table-bordered table-striped" style="width:100%">

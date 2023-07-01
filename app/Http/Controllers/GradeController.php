@@ -127,7 +127,7 @@ class GradeController extends Controller
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
 
         $data = [
-            'title' => 'Tambah Penilaian',
+            'title' => 'Tambah Penilaian Kelas',
             'schoolYears' => $schoolYears
         ];
 
@@ -144,7 +144,7 @@ class GradeController extends Controller
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
 
         $data = [
-            'title' => 'Tambah Penilaian',
+            'title' => 'Tambah Penilaian Mata Pelajaran',
             'schoolYears' => $schoolYears
         ];
 
@@ -276,7 +276,7 @@ class GradeController extends Controller
         $schoolYears = SchoolYear::orderBy('name', 'DESC')->get();
 
         $data = [
-            'title' => 'Edit Penilaian',
+            'title' => 'Edit Penilaian Kelas',
             'report' => $report,
             'schoolYears' => $schoolYears
         ];

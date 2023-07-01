@@ -57,13 +57,13 @@ class ReportController extends Controller
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->groupBy('semester')->get();
+                }])->groupBy('semester')->groupBy('student_id')->groupBy('class_room_id')->get();
             } else {
                 $reports = Report::whereRelation('class_room', 'school_year_id', $request->school_year_id)->where('semester', $request->semester)->where('class_room_id', $request->class_room_id)->where('semester', $request->semester)->whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->groupBy('semester')->get();
+                }])->groupBy('semester')->groupBy('student_id')->groupBy('class_room_id')->get();
             }
         } else {
             if ($user->role->name === 'Teacher') {
@@ -71,25 +71,25 @@ class ReportController extends Controller
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->groupBy('semester')->get();
+                }])->groupBy('semester')->groupBy('student_id')->groupBy('class_room_id')->get();
             } else {
                 $reports = Report::whereHas('class_room')->with(['class_room' => function ($query) {
                     $query->orderBy('name', 'ASC');
                 }])->whereHas('student.user')->with(['student.user' => function ($query) {
                     $query->orderBy('name', 'ASC');
-                }])->groupBy('semester')->get();
+                }])->groupBy('semester')->groupBy('student_id')->groupBy('class_room_id')->get();
             }
         }
 
         return DataTables::of($reports)
         ->addIndexColumn()
-        ->editColumn('school_year', function($report) {
+        ->editColumn('school_year', function ($report) {
             return $report->class_room->school_year->name;
         })
-        ->editColumn('class_room', function($report) {
+        ->editColumn('class_room', function ($report) {
             return $report->class_room->name;
         })
-        ->editColumn('student', function($report) {
+        ->editColumn('student', function ($report) {
             return $report->student->user->name;
         })
         ->addColumn('action', function ($report) {
@@ -124,6 +124,7 @@ class ReportController extends Controller
         $data = [
             'title' => 'Lihat E-Raport',
             'studentData' => $studentData,
+            'report_id' => $report->id,
             'reports' => $reports
         ];
 
