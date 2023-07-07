@@ -63,8 +63,8 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $item->student->user->name }}</td>
-                                    <td>{{ $item->grade->value}}</td>
-                                    <td>{{ $item->grade->description}}</td>
+                                    <td>{{ $item->grade?->value}}</td>
+                                    <td>{{ $item->grade?->description}}</td>
                                   </tr>
                                 @empty
                                 <tr>
@@ -89,8 +89,8 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $item->student->user->name }}</td>
-                                    <td>{{ $item->grade->value}}</td>
-                                    <td>{{ $item->grade->description}}</td>
+                                    <td>{{ $item->grade?->value}}</td>
+                                    <td>{{ $item->grade?->description}}</td>
                                   </tr>
                                 @empty
                                 <tr>

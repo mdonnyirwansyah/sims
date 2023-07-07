@@ -167,14 +167,14 @@ function printErrorMsg (msg) {
                                         <label class="col-sm-3 col-form-label">{{ $item->student->user->name }} <span class="text-danger">*</span></label>
                                         <input type="hidden" name="students[{{ $index }}][id]" value="{{ $item->student->id }}">
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" id="students_{{ $index }}_value" name="students[{{ $index }}][value]" placeholder="Nilai" value="{{ $item->grade->value }}">
+                                            <input type="number" class="form-control" id="students_{{ $index }}_value" name="students[{{ $index }}][value]" placeholder="Nilai" value="{{ $item->grade?->value }}">
                                             <small class="invalid-feedback students_{{ $index }}_value_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-3 col-form-label"></label>
                                         <div class="col-sm-9">
-                                            <textarea id="students_{{ $index }}_description" class="form-control" id="students_{{ $index }}_description" name="students[{{ $index }}][description]" placeholder="Keterangan">{{ $item->grade->description }}</textarea>
+                                            <textarea id="students_{{ $index }}_description" class="form-control" id="students_{{ $index }}_description" name="students[{{ $index }}][description]" placeholder="Keterangan">{{ $item->grade?->description }}</textarea>
                                             <small class="invalid-feedback students_{{ $index }}_description_err"></small>
                                         </div>
                                     </div>
@@ -228,24 +228,24 @@ function printErrorMsg (msg) {
                                         <label for="type" class="col-sm-3 col-form-label">Jenis <span class="text-danger">*</span></label>
                                         <div class="col-sm-9">
                                             <select class="form-control" id="type" name="type" readonly>
-                                                <option value="Pengetahuan">Pengetahuan</option>
+                                                <option value="Keterampilan">Keterampilan</option>
                                             </select>
                                             <small class="invalid-feedback type_err"></small>
                                         </div>
                                     </div>
-                                    @foreach ($data['report']['pengetahuan'] as $index => $item)
+                                    @foreach ($data['report']['keterampilan'] as $index => $item)
                                     <div class="form-group row">
                                         <label class="col-sm-3 col-form-label">{{ $item->student->user->name }}</label>
                                         <input type="hidden" name="students[{{ $index }}][id]" value="{{ $item->student->id }}">
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" id="students_{{ $index }}_value" name="students[{{ $index }}][value]" placeholder="Nilai" value="{{ $item->grade->value }}">
+                                            <input type="number" class="form-control" id="students_{{ $index }}_value" name="students[{{ $index }}][value]" placeholder="Nilai" value="{{ $item->grade?->value }}">
                                             <small class="invalid-feedback students_{{ $index }}_value_err"></small>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-3 col-form-label"></label>
                                         <div class="col-sm-9">
-                                            <textarea id="students_{{ $index }}_description" class="form-control" id="students_{{ $index }}_description" name="students[{{ $index }}][description]" placeholder="Keterangan">{{ $item->grade->description }}</textarea>
+                                            <textarea id="students_{{ $index }}_description" class="form-control" id="students_{{ $index }}_description" name="students[{{ $index }}][description]" placeholder="Keterangan">{{ $item->grade?->description }}</textarea>
                                             <small class="invalid-feedback students_{{ $index }}_description_err"></small>
                                         </div>
                                     </div>

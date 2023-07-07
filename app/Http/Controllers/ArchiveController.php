@@ -90,7 +90,6 @@ class ArchiveController extends Controller
         $report['pengetahuan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
             $query->where('subjects_id', $lessonSchedule->subjects_id);
         }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Pengetahuan')->get();
-
         $report['keterampilan'] = Report::with(['grade' => function ($query) use ($lessonSchedule) {
             $query->where('subjects_id', $lessonSchedule->subjects_id);
         }])->where('class_room_id', $lessonSchedule->class_room_id)->where('semester', $lessonSchedule->semester)->where('type', 'Keterampilan')->get();
@@ -158,8 +157,6 @@ class ArchiveController extends Controller
             'report' => $report,
             'lesson_schedule' => $lessonSchedule
         ];
-
-        // return view('main.grade.archive.print', compact('data'));
 
         $pdf = Pdf::loadView('main.grade.archive.print', compact('data'))
         ->setPaper('a4');

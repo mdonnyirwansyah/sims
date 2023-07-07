@@ -47,10 +47,10 @@ class ClassRoomController extends Controller
 
         return DataTables::of($classRooms)
         ->addIndexColumn()
-        ->editColumn('school_year', function($classRooms) {
+        ->editColumn('school_year', function ($classRooms) {
             return $classRooms->school_year->name;
         })
-        ->editColumn('teacher', function($classRooms) {
+        ->editColumn('teacher', function ($classRooms) {
             return $classRooms->teacher->user->name;
         })
         ->addColumn('action', function ($classRoom) {
@@ -128,19 +128,32 @@ class ClassRoomController extends Controller
      */
     public function studentAdd(ClassRoom $classRoom)
     {
+        $schoolYear = SchoolYear::where('status', '1')->first();
+
+        $studentsHasClass = Student::whereHas('user')->with(['user' => function ($query) {
+            $query->orderBy('name', 'ASC');
+        }, 'class_rooms'])->whereRelation('class_rooms', 'school_year_id', $schoolYear->id)->get()->map(function (Student $student) {
+            return $student->id;
+        });
+
+        $studentsInClass = Student::whereHas('user')->with(['user' => function ($query) {
+            $query->orderBy('name', 'ASC');
+        }, 'class_rooms'])->whereRelation('class_rooms', 'class_room_id', $classRoom->id)->get();
+
+        $studentsIdInClass = $studentsInClass->map(function ($student) {
+            return $student->id;
+        });
+
         $students = Student::whereHas('user')->with(['user' => function ($query) {
             $query->orderBy('name', 'ASC');
-        }])->get();
-
-        $classRoomStudents = $classRoom->students->map(function ($item) {
-            return $item->id;
-        });
+        }, 'class_rooms'])->whereNotIn('id', $studentsHasClass)->get();
 
         $data = [
             'title' => 'Tambah Siswa',
             'classRoom' => $classRoom,
             'students' => $students,
-            'classRoomStudents' => $classRoomStudents
+            'studentsInClass' => $studentsInClass,
+            'studentsIdInClass' => $studentsIdInClass
         ];
 
         return view('main.data.class-room.student-add', compact('data'));

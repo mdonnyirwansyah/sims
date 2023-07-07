@@ -17,8 +17,8 @@ $(document).ready(function() {
       theme: 'bootstrap4'
     });
 
-    var values = {{ $data['classRoomStudents'] }};
-    
+    var values = {{ $data['studentsIdInClass'] }};
+
     $('#students').val(values).change();
 });
 </script>
@@ -88,6 +88,9 @@ $(document).ready(function() {
                                 <label for="students" class="col-sm-3 col-form-label">Data Siswa <span class="text-danger">*</span></label>
                                 <div class="col-sm-9">
                                     <select class="form-control select2 @error('students') is-invalid @enderror" multiple="multiple" data-placeholder="Pilih Siswa" style="width: 100%;" id="students" name="students[]">
+                                        @foreach ($data['studentsInClass'] as $student)
+                                            <option value="{{ $student->id }}">{{ $student->nis .' - '. $student->user->name }}</option>
+                                        @endforeach
                                         @foreach ($data['students'] as $student)
                                             <option value="{{ $student->id }}">{{ $student->nis .' - '. $student->user->name }}</option>
                                         @endforeach
